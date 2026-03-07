@@ -89,9 +89,33 @@ THE SYSTEM SHALL display a strength slider
 WHEN the user adjusts the strength
 THE SYSTEM SHALL affect how much clay is added/removed/pulled per interaction
 
+**US-8: View Mode**
+- As a user, I want a view-only mode so I can examine my model without accidentally modifying it
+
+WHEN the user selects the "View" tool
+THE SYSTEM SHALL disable all editing tools
+
+WHEN the user is in view mode
+THE SYSTEM SHALL allow pinch to zoom (0.5x to 5x)
+
+WHEN the user is in view mode
+THE SYSTEM SHALL allow single-finger drag to rotate around the model center
+
+WHEN the user is in view mode
+THE SYSTEM SHALL allow two-finger drag to pan the camera
+
+WHEN the user double-taps in view mode
+THE SYSTEM SHALL reset the camera to default position
+
+WHEN the user is in view mode
+THE SYSTEM SHALL display the current zoom level
+
+WHEN the user is in view mode
+THE SYSTEM SHALL keep the clay model centered as the pivot point for all rotations
+
 ### Save & Load
 
-**US-8: Save Model**
+**US-9: Save Model**
 - As a user, I want to save my work so I can continue later or export for printing
 
 WHEN the user selects "Save Model"
@@ -103,7 +127,7 @@ THE SYSTEM SHALL store the model data to device storage
 WHEN the save is complete
 THE SYSTEM SHALL display a confirmation message
 
-**US-9: Load Model**
+**US-10: Load Model**
 - As a user, I want to load previously saved models so I can continue working on them
 
 WHEN the user selects "Load Model"
@@ -115,7 +139,7 @@ THE SYSTEM SHALL load the model and display it in the viewport
 WHEN the model fails to load
 THE SYSTEM SHALL display an error message and maintain the current model
 
-**US-10: Export for 3D Printing**
+**US-11: Export for 3D Printing**
 - As a user, I want to export my model as an STL file so I can 3D print it
 
 WHEN the user selects "Export STL"
@@ -129,7 +153,7 @@ THE SYSTEM SHALL display the file location to the user
 
 ### User Interface
 
-**US-11: Tool Selection**
+**US-12: Tool Selection**
 - As a user, I want easy access to all tools so I can switch between them quickly
 
 WHEN the app is running
@@ -138,7 +162,7 @@ THE SYSTEM SHALL display a toolbar with all available tools
 WHEN the user taps a tool icon
 THE SYSTEM SHALL activate that tool and highlight it visually
 
-**US-12: Undo/Redo**
+**US-13: Undo/Redo**
 - As a user, I want to undo mistakes so I can experiment freely
 
 WHEN the user performs a modeling action
@@ -157,7 +181,7 @@ THE SYSTEM SHALL disable the respective button
 
 ### Unit Tests
 
-**US-13: Core Logic Testing**
+**US-14: Core Logic Testing**
 - As a developer, I want comprehensive unit tests so I can refactor with confidence
 
 WHEN unit tests are executed
@@ -177,7 +201,7 @@ THE SYSTEM SHALL achieve at least 80% code coverage for business logic
 
 ### Integration Tests
 
-**US-14: Workflow Testing**
+**US-15: Workflow Testing**
 - As a developer, I want integration tests so I can verify end-to-end functionality
 
 WHEN integration tests are executed
@@ -194,7 +218,7 @@ THE SYSTEM SHALL test undo/redo with multiple operations
 
 ### CI/CD Pipeline
 
-**US-15: Automated Quality Checks**
+**US-16: Automated Quality Checks**
 - As a developer, I want automated CI checks so code quality is maintained
 
 WHEN code is pushed to the repository
@@ -245,11 +269,15 @@ THE SYSTEM SHALL pass all CI pipeline tests including unit and integration tests
 - User can create a new clay sphere model
 - User can remove, add, and pull clay with visible real-time updates
 - User can rotate, zoom, and pan the camera view
+- User can enter view mode to examine model without editing
 - User can adjust brush size and strength
 - User can save models and load them later
 - User can export models as STL files
 - App maintains smooth performance during modeling
 - Undo/redo functionality works correctly
+- UI follows Material Design guidelines with proper accessibility
+- All dialogs and states are properly designed
+- App works in portrait and landscape orientations
 - Unit tests achieve 80%+ coverage of business logic
 - Integration tests cover all critical workflows
 - CI pipeline passes all lint and test checks

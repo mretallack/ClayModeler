@@ -115,6 +115,15 @@ interface Tool {
 - Blend drag direction with surface normal
 - Maintains surface smoothness
 
+**ViewModeTool:**
+- Disables mesh modification
+- Enables camera manipulation only
+- Pinch gesture: Zoom (0.5x to 5x scale)
+- Single-finger drag: Rotate around model center
+- Two-finger drag: Pan camera
+- Double-tap: Reset to default view
+- All transformations pivot around clay model origin
+
 ### 3. ModelRenderer
 
 OpenGL ES 3.0 renderer for 3D visualization.
@@ -258,25 +267,378 @@ To determine where the user touched on the 3D model:
 - Optional: Reduce triangle count for export
 - Preserve visual quality while reducing file size
 
-## UI Layout
+## UI Layout & Visual Design
 
+### Wireframes
+
+**Portrait Mode (Primary):**
 ```
 ┌─────────────────────────────────────────┐
-│  [≡] Clay Modeler        [↶] [↷] [💾]  │ ← Top bar
+│  [≡] Clay Modeler        [↶] [↷] [💾]  │ ← Top bar (56dp)
 ├─────────────────────────────────────────┤
 │                                         │
 │                                         │
-│           3D Viewport                   │
-│         (GLSurfaceView)                 │
+│           3D Viewport                   │ ← Expandable
+│         (GLSurfaceView)                 │   (fills space)
 │                                         │
 │                                         │
 ├─────────────────────────────────────────┤
-│  [Remove] [Add] [Pull]                  │ ← Tool bar
+│  [🗑️ Remove] [➕ Add] [👆 Pull] [👁️ View]│ ← Tool bar (72dp)
 ├─────────────────────────────────────────┤
-│  Size:   [────●────]                    │ ← Settings
+│  Size:     [────●────]                  │ ← Settings (120dp)
 │  Strength: [──●──────]                  │
 └─────────────────────────────────────────┘
 ```
+
+**Landscape Mode:**
+```
+┌──────────────────────────────────────────────────────────┐
+│  [≡] Clay Modeler              [↶] [↷] [💾]             │
+├────────────────────────────────┬─────────────────────────┤
+│                                │  [🗑️ Remove]            │
+│                                │  [➕ Add]               │
+│         3D Viewport            │  [👆 Pull]              │
+│       (GLSurfaceView)          │  [👁️ View]              │
+│                                │                         │
+│                                │  Size:   [──●──]        │
+│                                │  Strength: [──●──]      │
+└────────────────────────────────┴─────────────────────────┘
+```
+
+**Tablet Mode (10" and above):**
+- Side panel for tools (persistent)
+- Larger touch targets (64dp)
+- More spacing between elements
+
+### Color Palette
+
+**Primary Colors:**
+- Primary: `#00897B` (Teal 600)
+- Primary Dark: `#00695C` (Teal 800)
+- Accent: `#FF6F00` (Orange 800)
+
+**Clay & Viewport:**
+- Clay Color: `#D2691E` (Terracotta)
+- Viewport Background: `#1A1A1A` (Near black)
+- Grid Lines (optional): `#333333` (Dark gray, 20% opacity)
+
+**UI Elements:**
+- Background: `#FAFAFA` (Light gray)
+- Surface: `#FFFFFF` (White)
+- Tool Bar: `#424242` (Dark gray)
+- Dividers: `#E0E0E0` (Light gray)
+
+**Text:**
+- Primary Text: `#212121` (87% black)
+- Secondary Text: `#757575` (54% black)
+- Disabled Text: `#BDBDBD` (38% black)
+- Text on Dark: `#FFFFFF` (White)
+
+**States:**
+- Selected Tool: `#00897B` (Primary)
+- Hover/Focus: `#B2DFDB` (Teal 100)
+- Error: `#D32F2F` (Red 700)
+- Success: `#388E3C` (Green 700)
+
+### Typography
+
+**Font Family:** Roboto (Material Design standard)
+
+**Sizes:**
+- App Title: 20sp, Medium
+- Tool Labels: 14sp, Medium
+- Slider Labels: 12sp, Regular
+- Body Text: 16sp, Regular
+- Button Text: 14sp, Medium (All caps)
+- Dialog Title: 20sp, Medium
+- Dialog Body: 16sp, Regular
+
+### Component Specifications
+
+**Top Bar (AppBar):**
+- Height: 56dp (phone), 64dp (tablet)
+- Elevation: 4dp
+- Background: Primary color
+- Icons: 24dp, white
+- Title: 20sp, white, medium weight
+
+**Tool Buttons:**
+- Size: 64dp × 64dp (phone), 72dp × 72dp (tablet)
+- Minimum touch target: 48dp × 48dp
+- Icon size: 24dp
+- Corner radius: 8dp
+- Elevation: 2dp (normal), 8dp (selected)
+- Spacing: 8dp between buttons
+- Selected state: Primary color background
+- Unselected state: Surface color background
+
+**Sliders:**
+- Track height: 4dp
+- Thumb size: 20dp diameter
+- Active color: Primary
+- Inactive color: Primary at 38% opacity
+- Label size: 12sp
+- Value display: 14sp, shown above thumb
+
+**3D Viewport:**
+- Fills remaining space
+- Minimum height: 200dp
+- Background: `#1A1A1A`
+- Border: None
+- Clay initial size: 40% of viewport height
+
+### Dialogs & Menus
+
+**Save Dialog:**
+```
+┌─────────────────────────────────┐
+│  Save Model                     │
+│                                 │
+│  Model Name:                    │
+│  [_________________________]    │
+│                                 │
+│  [CANCEL]           [SAVE]      │
+└─────────────────────────────────┘
+```
+- Width: 280dp (phone), 400dp (tablet)
+- Padding: 24dp
+- Button height: 36dp
+- Text field height: 56dp
+
+**Load Dialog:**
+```
+┌─────────────────────────────────┐
+│  Load Model                     │
+│                                 │
+│  ┌───────────────────────────┐ │
+│  │ ● Model_001.clay          │ │
+│  │   Created: 2024-03-07     │ │
+│  ├───────────────────────────┤ │
+│  │ ● Model_002.clay          │ │
+│  │   Created: 2024-03-06     │ │
+│  └───────────────────────────┘ │
+│                                 │
+│  [CANCEL]           [LOAD]      │
+└─────────────────────────────────┘
+```
+- List item height: 72dp
+- Icon size: 40dp
+- Max visible items: 5 (scrollable)
+
+**Export Dialog:**
+```
+┌─────────────────────────────────┐
+│  Export STL                     │
+│                                 │
+│  File Name:                     │
+│  [_________________________]    │
+│                                 │
+│  Quality:                       │
+│  ○ Low    ● Medium    ○ High    │
+│                                 │
+│  [CANCEL]         [EXPORT]      │
+└─────────────────────────────────┘
+```
+
+**Menu (Hamburger):**
+- New Model
+- Save Model
+- Load Model
+- Export STL
+- Settings
+- Help
+- About
+
+### States & Feedback
+
+**Loading States:**
+- Circular progress indicator (48dp)
+- Centered in viewport
+- Primary color
+- Text: "Loading model..." (16sp, secondary text)
+
+**Error States:**
+```
+┌─────────────────────────────────┐
+│  ⚠️                              │
+│  Failed to load model           │
+│  File may be corrupted          │
+│                                 │
+│  [DISMISS]          [RETRY]     │
+└─────────────────────────────────┘
+```
+- Icon: 48dp, error color
+- Message: 16sp, error color
+- Snackbar for non-critical errors
+
+**Empty State (Load Dialog):**
+```
+┌─────────────────────────────────┐
+│  Load Model                     │
+│                                 │
+│         📦                       │
+│    No saved models              │
+│    Create your first model!     │
+│                                 │
+│  [CANCEL]                       │
+└─────────────────────────────────┘
+```
+
+**Success Feedback:**
+- Snackbar: "Model saved successfully"
+- Duration: 3 seconds
+- Action: "UNDO" (optional)
+- Background: Success color
+
+**Tool Cursor/Preview:**
+- Circle overlay on model surface
+- Diameter: Current brush size
+- Color: White with 50% opacity
+- Border: 2dp, primary color
+- Updates in real-time as slider changes
+
+### View Mode
+
+**View Mode Activation:**
+- Dedicated "View" button in tool bar
+- Icon: Eye symbol (👁️)
+- When active: All editing tools disabled
+- Visual indicator: Blue border around viewport
+
+**View Mode Controls:**
+- **Pinch:** Zoom in/out (0.5x to 5x)
+- **Single-finger drag:** Rotate around model center
+- **Two-finger drag:** Pan camera
+- **Double-tap:** Reset to default view
+- All gestures centered on clay model origin
+
+**View Mode UI:**
+- Zoom level indicator: Bottom-right corner
+- Format: "1.0x" (14sp, white with shadow)
+- Reset button: Floating action button (56dp)
+- Icon: Home/center icon
+- Position: Bottom-right, 16dp margin
+
+### Interactions & Animations
+
+**Tool Selection:**
+- Duration: 150ms
+- Easing: Fast out, slow in
+- Scale: 1.0 → 1.1 → 1.0
+- Elevation change: 2dp → 8dp
+
+**Slider Interaction:**
+- Thumb scales to 24dp when dragging
+- Haptic feedback on value change
+- Value label appears above thumb
+
+**Model Manipulation:**
+- Real-time mesh updates (< 16ms)
+- Smooth interpolation for tool application
+- No animation delay
+
+**Undo/Redo:**
+- Button pulse animation on action
+- Duration: 200ms
+- Disabled state: 38% opacity
+
+**Dialog Transitions:**
+- Fade in: 200ms
+- Scale: 0.8 → 1.0
+- Backdrop: Fade to 50% black
+
+**Snackbar:**
+- Slide up from bottom: 250ms
+- Auto-dismiss: 3 seconds
+- Swipe to dismiss
+
+### Accessibility
+
+**Content Descriptions:**
+- Menu button: "Open menu"
+- Undo button: "Undo last action"
+- Redo button: "Redo action"
+- Save button: "Save model"
+- Remove tool: "Remove clay tool"
+- Add tool: "Add clay tool"
+- Pull tool: "Pull clay tool"
+- View tool: "View mode - zoom and rotate"
+- Size slider: "Brush size, current value X percent"
+- Strength slider: "Brush strength, current value X percent"
+
+**Touch Targets:**
+- Minimum: 48dp × 48dp
+- Recommended: 56dp × 56dp for primary actions
+- Spacing: 8dp minimum between targets
+
+**Color Contrast:**
+- Text on background: 4.5:1 minimum (WCAG AA)
+- Large text: 3:1 minimum
+- Icons: 3:1 minimum
+- All critical UI elements meet WCAG AA standards
+
+**Screen Reader Support:**
+- Announce tool changes
+- Announce undo/redo actions
+- Announce save/load success/failure
+- Describe model state changes
+
+### Responsive Design
+
+**Phone (< 600dp width):**
+- Portrait: Vertical layout (as shown)
+- Landscape: Horizontal split (tools on right)
+- Tool bar: Scrollable if needed
+- Settings: Collapsible panel
+
+**Tablet (600dp - 840dp):**
+- Side panel for tools (persistent)
+- Larger touch targets (64dp)
+- More padding (24dp vs 16dp)
+- Two-column dialogs where appropriate
+
+**Large Tablet (> 840dp):**
+- Master-detail layout option
+- Tool palette can float
+- Multiple viewports (future enhancement)
+
+**Minimum Requirements:**
+- Screen width: 320dp
+- Screen height: 480dp
+- Aspect ratio: 16:9 to 21:9
+
+### Navigation Flow
+
+```
+Launch App
+    ↓
+Main Screen (New Model)
+    ↓
+    ├─→ Menu → Save → Save Dialog → Main Screen
+    ├─→ Menu → Load → Load Dialog → Main Screen (loaded model)
+    ├─→ Menu → Export → Export Dialog → Success Snackbar
+    ├─→ Menu → Settings → Settings Screen → Main Screen
+    ├─→ Menu → Help → Help Screen → Main Screen
+    └─→ Menu → About → About Dialog → Main Screen
+```
+
+**Back Button Behavior:**
+- Main screen: Exit app (with confirmation if unsaved changes)
+- Dialog: Close dialog
+- Settings/Help: Return to main screen
+- View mode: Exit view mode, return to last tool
+
+### Performance Indicators
+
+**FPS Counter (Debug mode):**
+- Position: Top-right corner
+- Format: "30 FPS" (12sp, white with shadow)
+- Updates every second
+- Hidden in release builds
+
+**Vertex Count (Debug mode):**
+- Position: Below FPS counter
+- Format: "12,345 vertices" (12sp, white with shadow)
 
 ## Technology Stack
 

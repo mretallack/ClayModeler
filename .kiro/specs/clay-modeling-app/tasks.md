@@ -34,6 +34,26 @@
 
 **Expected Outcome:** UI layout displays correctly in both orientations
 
+### Task 1.4: App Icon and Launcher
+- [ ] Design app icon (clay sphere or sculpting tool)
+- [ ] Create adaptive icon (foreground + background)
+- [ ] Generate all required densities (mdpi to xxxhdpi)
+- [ ] Configure launcher icon in AndroidManifest.xml
+- [ ] Test icon appears correctly on different launchers
+- [ ] Add icon to F-Droid metadata
+
+**Expected Outcome:** App has professional icon
+
+### Task 1.5: Storage Permissions Setup
+- [ ] Add storage permissions to AndroidManifest.xml
+- [ ] Implement runtime permission request for Android 6+
+- [ ] Configure scoped storage for Android 10+
+- [ ] Set up MediaStore API for Downloads access
+- [ ] Handle permission denied gracefully
+- [ ] Test on Android 8, 10, 12, 14
+
+**Expected Outcome:** App can access storage correctly on all Android versions
+
 ## Phase 2: 3D Rendering (Week 2)
 
 ### Task 2.1: OpenGL Renderer Setup
@@ -136,6 +156,18 @@
 
 **Expected Outcome:** User can examine model without editing
 
+### Task 3.7: Tool Cursor Implementation
+- [ ] Create circular overlay shader for cursor
+- [ ] Position cursor at ray-cast hit point
+- [ ] Scale cursor based on brush size setting
+- [ ] Render cursor with 50% opacity white fill
+- [ ] Add 2dp primary color border
+- [ ] Update cursor in real-time as slider changes
+- [ ] Hide cursor in View mode
+- [ ] Test cursor visibility on different backgrounds
+
+**Expected Outcome:** Visual preview of tool size on model surface
+
 ## Phase 4: Tool Settings (Week 4)
 
 ### Task 4.1: Brush Size Control
@@ -230,6 +262,19 @@
 
 **Expected Outcome:** Work auto-saves every minute
 
+### Task 6.6: Thumbnail Generation
+- [ ] Implement OpenGL screenshot capture
+- [ ] Render model to offscreen framebuffer (256x256)
+- [ ] Convert framebuffer to Bitmap
+- [ ] Scale bitmap to 128x128
+- [ ] Save as PNG to thumbnails directory
+- [ ] Generate thumbnail on save
+- [ ] Update thumbnail on model changes
+- [ ] Handle thumbnail generation errors
+- [ ] Add unit tests for thumbnail creation
+
+**Expected Outcome:** Each saved model has a thumbnail preview
+
 ## Phase 7: STL Export (Week 6)
 
 ### Task 7.1: STL Export Implementation
@@ -267,6 +312,17 @@
 - [ ] Test export workflow
 
 **Expected Outcome:** User can export with custom settings
+
+### Task 7.4: ASCII STL Export (Debug)
+- [ ] Implement ASCII STL writer
+- [ ] Format: "solid [name]" header
+- [ ] Write facets with normals and vertices
+- [ ] Add "endsolid" footer
+- [ ] Add checkbox in export dialog (debug mode only)
+- [ ] Test ASCII format with text editor
+- [ ] Verify compatibility with slicing software
+
+**Expected Outcome:** Debug builds can export ASCII STL for inspection
 
 ## Phase 8: Testing & Quality (Week 7)
 
@@ -351,7 +407,107 @@
 
 **Expected Outcome:** Project is documented
 
-### Task 9.5: CI/CD Pipeline
+### Task 9.5: Menu Implementation
+- [ ] Create navigation drawer or popup menu
+- [ ] Add menu items: New Model, Save, Load, Export, Settings, Help, About
+- [ ] Implement menu item click handlers
+- [ ] Connect menu to ViewModel actions
+- [ ] Add menu icons
+- [ ] Test menu on phone and tablet
+- [ ] Handle back button to close menu
+
+**Expected Outcome:** User can access all app functions via menu
+
+### Task 9.6: New Model Action
+- [ ] Add "New Model" menu item
+- [ ] Show confirmation dialog if unsaved changes
+- [ ] Clear current model and undo/redo stacks
+- [ ] Reset camera to default position
+- [ ] Generate new sphere
+- [ ] Reset tool settings to defaults
+- [ ] Test new model workflow
+
+**Expected Outcome:** User can start fresh model
+
+### Task 9.7: Settings Screen
+- [ ] Create settings activity/fragment (if needed)
+- [ ] Add preference for default sphere subdivision level
+- [ ] Add preference for auto-save interval
+- [ ] Add preference for default export size
+- [ ] Save preferences using SharedPreferences
+- [ ] Apply settings on app start
+- [ ] Test settings persistence
+
+**Expected Outcome:** User can configure app preferences (optional for MVP)
+
+### Task 9.8: Help Screen
+- [ ] Create help activity/dialog
+- [ ] Add basic usage instructions
+- [ ] Explain each tool with icons
+- [ ] Add gesture guide (pinch, drag, etc.)
+- [ ] Include tips for 3D printing
+- [ ] Add scrollable text view
+- [ ] Test help is accessible and clear
+
+**Expected Outcome:** User can learn how to use the app
+
+### Task 9.9: About Screen
+- [ ] Create about dialog
+- [ ] Display app name and version
+- [ ] Add developer credits
+- [ ] Include license information (GPL/MIT/Apache)
+- [ ] Add link to source code repository
+- [ ] Add privacy statement (no data collection)
+- [ ] Test about dialog displays correctly
+
+**Expected Outcome:** User can see app information
+
+### Task 9.10: Snackbar Notifications
+- [ ] Implement Snackbar helper class
+- [ ] Add success snackbar for save/export
+- [ ] Add error snackbar for failures
+- [ ] Add warning snackbar for validation issues
+- [ ] Configure 3-second auto-dismiss
+- [ ] Add swipe-to-dismiss
+- [ ] Test snackbars don't overlap
+- [ ] Ensure snackbars are accessible
+
+**Expected Outcome:** User receives feedback for actions
+
+### Task 9.11: UI Animations
+- [ ] Implement tool selection animation (150ms scale)
+- [ ] Add dialog fade-in animation (200ms)
+- [ ] Add dialog scale animation (0.8 → 1.0)
+- [ ] Implement snackbar slide-up (250ms)
+- [ ] Add button ripple effects
+- [ ] Add undo/redo button pulse on action
+- [ ] Test animations feel smooth
+- [ ] Ensure animations respect accessibility settings
+
+**Expected Outcome:** UI feels polished and responsive
+
+### Task 9.12: Double-tap Reset in View Mode
+- [ ] Implement double-tap gesture detection
+- [ ] Reset camera to default position on double-tap
+- [ ] Animate camera transition smoothly
+- [ ] Only active in View mode
+- [ ] Add haptic feedback on reset
+- [ ] Test double-tap doesn't conflict with other gestures
+
+**Expected Outcome:** User can quickly reset view
+
+### Task 9.13: Zoom Level Indicator
+- [ ] Create zoom level text overlay (bottom-right)
+- [ ] Format as "1.0x" with 14sp white text
+- [ ] Add text shadow for visibility
+- [ ] Update in real-time during pinch
+- [ ] Only show in View mode
+- [ ] Fade out after 2 seconds of no interaction
+- [ ] Test visibility on different backgrounds
+
+**Expected Outcome:** User knows current zoom level
+
+### Task 9.14: CI/CD Pipeline
 - [ ] Create `.github/workflows/android-ci.yml`
 - [ ] Configure Gradle wrapper validation
 - [ ] Add build job (assembleDebug)
@@ -390,9 +546,41 @@
 
 **Expected Outcome:** App ready for F-Droid
 
+### Task 10.4: Proguard/R8 Configuration
+- [ ] Create proguard-rules.pro
+- [ ] Add keep rules for OpenGL classes
+- [ ] Add keep rules for ACRA
+- [ ] Add keep rules for serialization classes
+- [ ] Test release build with minification
+- [ ] Verify app works after obfuscation
+- [ ] Check APK size reduction
+
+**Expected Outcome:** Release build is optimized and functional
+
+### Task 10.5: App Signing Setup
+- [ ] Generate release keystore
+- [ ] Configure signing in build.gradle.kts
+- [ ] Store keystore securely (not in repo)
+- [ ] Document signing process
+- [ ] Test signed release build
+- [ ] Verify signature with jarsigner
+
+**Expected Outcome:** App can be signed for release
+
+### Task 10.6: Final Polish
+- [ ] Review all UI strings for consistency
+- [ ] Check all icons are correct size/density
+- [ ] Verify all colors match design spec
+- [ ] Test all animations are smooth
+- [ ] Ensure no debug logs in release
+- [ ] Check APK size is reasonable (<10MB)
+- [ ] Verify app name and package name
+
+**Expected Outcome:** App is polished and ready for users
+
 ## Summary
 
-**Total Tasks:** ~100
+**Total Tasks:** ~120
 **Estimated Duration:** 8-10 weeks
 **Team Size:** 1 developer
 
@@ -406,3 +594,18 @@
 - Week 1-2 is proof of concept (validate OpenGL performance)
 - Can adjust scope if timeline slips
 - Core features prioritized over polish
+
+**Added Tasks (Complete Coverage):**
+- Phase 1: App icon, storage permissions (2 tasks)
+- Phase 3: Tool cursor implementation (1 task)
+- Phase 6: Thumbnail generation (1 task)
+- Phase 7: ASCII STL export (1 task)
+- Phase 9: Menu, navigation, UI polish (9 tasks)
+- Phase 10: Proguard, signing, final polish (3 tasks)
+
+**Coverage:**
+- All 16 user stories: ✅ 100%
+- All NFRs: ✅ 100%
+- All acceptance criteria: ✅ 100%
+- UI/UX details: ✅ 100%
+- Release preparation: ✅ 100%

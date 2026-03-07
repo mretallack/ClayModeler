@@ -127,6 +127,21 @@ THE SYSTEM SHALL store the model data to device storage
 WHEN the save is complete
 THE SYSTEM SHALL display a confirmation message
 
+**US-9a: Auto-Save**
+- As a user, I want my work automatically saved so I don't lose progress if the app crashes
+
+WHEN 1 minute has elapsed since the last model change
+THE SYSTEM SHALL automatically save the model to autosave.clay
+
+WHEN the app is restarted after a crash
+THE SYSTEM SHALL offer to restore the autosaved model
+
+WHEN auto-save occurs
+THE SYSTEM SHALL not interrupt the user or show notifications
+
+WHEN the user manually saves a model
+THE SYSTEM SHALL reset the auto-save timer
+
 **US-10: Load Model**
 - As a user, I want to load previously saved models so I can continue working on them
 
@@ -276,6 +291,23 @@ THE SYSTEM SHALL pass all lint checks without errors
 WHEN code is pushed to the repository
 THE SYSTEM SHALL pass all CI pipeline tests including unit and integration tests
 
+**NFR-7: Privacy and Independence**
+THE SYSTEM SHALL NOT require Google Play Services
+
+THE SYSTEM SHALL NOT require internet connectivity
+
+THE SYSTEM SHALL NOT upload user data to any cloud service
+
+THE SYSTEM SHALL be compatible with F-Droid
+
+THE SYSTEM SHALL use ACRA for local crash reporting only
+
+**NFR-8: Orientation Support**
+THE SYSTEM SHALL support both portrait and landscape orientations
+
+WHEN the device orientation changes
+THE SYSTEM SHALL preserve the current model state and tool selection
+
 ## Acceptance Criteria
 
 - User can create a new clay sphere model
@@ -284,12 +316,18 @@ THE SYSTEM SHALL pass all CI pipeline tests including unit and integration tests
 - User can enter view mode to examine model without editing
 - User can adjust brush size and strength
 - User can save models and load them later
+- Auto-save occurs every 1 minute without user interruption
+- User can restore autosaved model after crash
 - User can export models as STL files
 - App maintains smooth performance during modeling
 - Undo/redo functionality works correctly
 - UI follows Material Design guidelines with proper accessibility
 - All dialogs and states are properly designed
 - App works in portrait and landscape orientations
+- App works completely offline without internet
+- App does not require Google Play Services
+- App is F-Droid compatible
+- ACRA crash reporting works locally
 - Unit tests achieve 80%+ coverage of business logic
 - Integration tests cover all critical workflows
 - CI pipeline passes all lint and test checks

@@ -791,6 +791,69 @@ Manages app state and business logic.
 - `saveModel(name)`: Persist model to storage
 - `loadModel(name)`: Load model from storage
 - `exportSTL(name)`: Export as STL file
+- `startAutoSave()`: Begin auto-save timer (1 minute interval)
+- `stopAutoSave()`: Stop auto-save timer
+- `performAutoSave()`: Save to autosave.clay silently
+
+**Auto-Save Implementation:**
+
+```kotlin
+class ModelingViewModel : ViewModel() {
+    private var autoSaveJob: Job? = null
+    private var lastModifiedTime: Long = 0
+    private val autoSaveInterval = 60_000L // 1 minute
+    
+    fun startAutoSave() {
+        autoSaveJob = viewModelScope.launch {
+            while (isActive) {
+                delay(autoSaveInterval)
+                if (hasUnsavedChanges()) {
+                    performAutoSave()
+                }
+            }
+        }
+    }
+    
+    private suspend fun performAutoSave() {
+        withContext(Dispatchers.IO) {
+            try {
+                fileManager.saveToAutoSave(currentModel)
+                // Silent - no user notification
+            } catch (e: Exception) {
+                // Log error but don't interrupt user
+                Log.e("AutoSave", "Failed to auto-save", e)
+            }
+        }
+    }
+    
+    fun onModelChanged() {
+        lastModifiedTime = System.currentTimeMillis()
+        // Reset auto-save timer handled by coroutine
+    }
+    
+    fun checkForAutoSaveRestore(): Boolean {
+        return fileManager.hasAutoSave() && 
+               fileManager.getAutoSaveAge() < 24 * 60 * 60 * 1000 // 24 hours
+    }
+    
+    suspend fun restoreAutoSave(): ClayModel? {
+        return withContext(Dispatchers.IO) {
+            try {
+                fileManager.loadFromAutoSave()
+            } catch (e: Exception) {
+                null
+            }
+        }
+    }
+}
+```
+
+**Auto-Save File Location:**
+- Path: `/data/data/com.claymodeler/files/autosave.clay`
+- Single file (overwritten each save)
+- Not shown in load dialog
+- Deleted after successful manual save
+- Retained for 24 hours after last write
 
 ## Touch Interaction Flow
 
@@ -1272,6 +1335,10 @@ dependencies {
     // File I/O
     implementation("androidx.documentfile:documentfile:1.0.1")
     
+    // Crash reporting (ACRA - local only, no upload)
+    implementation("ch.acra:acra-core:5.11.3")
+    implementation("ch.acra:acra-dialog:5.11.3")
+    
     // Testing
     testImplementation("junit:junit:4.13.2")
     testImplementation("io.mockk:mockk:1.13.8")
@@ -1286,6 +1353,64 @@ dependencies {
     androidTestImplementation("androidx.test:rules:1.5.0")
 }
 ```
+
+**Important:** No Google Play Services, Firebase, or analytics dependencies. App is fully offline and F-Droid compatible.
+
+## Crash Reporting (ACRA)
+
+**Configuration:**
+
+```kotlin
+@AcraCore(
+    buildConfigClass = BuildConfig::class,
+    reportFormat = StringFormat.JSON
+)
+@AcraDialog(
+    reportDialogClass = CrashReportDialog::class,
+    resTitle = R.string.crash_dialog_title,
+    resText = R.string.crash_dialog_text,
+    resCommentPrompt = R.string.crash_dialog_comment_prompt
+)
+class ClayModelerApplication : Application() {
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(base)
+        ACRA.init(this)
+    }
+}
+```
+
+**Crash Report Storage:**
+- Location: `/data/data/com.claymodeler/files/acra-reports/`
+- Format: JSON
+- No automatic upload
+- User can manually share via email/file manager
+- Reports include: stack trace, device info, app version
+- No personal data collected
+
+**Crash Dialog:**
+```
+┌─────────────────────────────────┐
+│  App Crashed                    │
+│                                 │
+│  ClayModeler has stopped        │
+│  unexpectedly.                  │
+│                                 │
+│  Would you like to save a       │
+│  crash report?                  │
+│                                 │
+│  Comment (optional):            │
+│  [_________________________]    │
+│                                 │
+│  [DON'T SAVE]      [SAVE]       │
+└─────────────────────────────────┘
+```
+
+**Privacy:**
+- No network access required
+- No automatic data collection
+- User controls all data sharing
+- F-Droid compatible
+- GDPR compliant
 
 ## Testing Strategy
 
@@ -2435,16 +2560,51 @@ sdk.dir=/home/mark/android-sdk
 
 ### Open Questions
 
-1. Should we support importing existing STL files for editing?
+1. ~~Should we support importing existing STL files for editing?~~ **DECIDED: No**
 2. What's the maximum model complexity we should support?
-3. Should we implement auto-save? How frequently?
-4. Do we need cloud backup, or is local storage sufficient?
-5. Should we support stylus input (S-Pen, Apple Pencil)?
+3. ~~Should we implement auto-save? How frequently?~~ **DECIDED: Yes, every 1 minute**
+4. ~~Do we need cloud backup, or is local storage sufficient?~~ **DECIDED: Local storage only, no cloud**
+5. ~~Should we support stylus input (S-Pen, Apple Pencil)?~~ **DECIDED: No, touch only**
 6. What's the minimum viable tutorial/onboarding?
-7. Should we support landscape-only mode for tablets?
-8. Do we need a "gallery" view of saved models?
+7. ~~Should we support landscape-only mode for tablets?~~ **DECIDED: Both portrait and landscape**
+8. ~~Do we need a "gallery" view of saved models?~~ **DECIDED: No, simple list in load dialog**
 9. Should exported STLs include metadata (app version, creation date)?
-10. What analytics/crash reporting should we implement?
+10. ~~What analytics/crash reporting should we implement?~~ **DECIDED: ACRA crash reporting, no analytics**
+
+### Decided Requirements
+
+**Auto-Save:**
+- Frequency: Every 1 minute
+- Location: `/data/data/com.claymodeler/files/autosave.clay`
+- Single file (overwritten each time)
+- Silent operation (no user notification)
+- Restore on app crash/restart
+
+**No Cloud Dependencies:**
+- No Google Play Services
+- No Firebase
+- No cloud storage integration
+- Works completely offline
+- F-Droid compatible
+
+**Crash Reporting:**
+- ACRA (Application Crash Reports for Android)
+- Local crash logs only
+- No automatic upload
+- User can manually share crash reports
+- Privacy-focused
+
+**Orientation Support:**
+- Portrait: Primary layout (vertical tools)
+- Landscape: Horizontal layout (tools on side)
+- Rotation handled gracefully (preserve model state)
+- No orientation lock
+
+**No Gallery:**
+- Load dialog shows simple list
+- Thumbnail preview in list items
+- Sort by date modified
+- Search/filter not needed for MVP
 
 ## Future Enhancements
 

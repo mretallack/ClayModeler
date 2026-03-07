@@ -2105,6 +2105,96 @@ fun assertFileFormatValid(file: File)
     path: app/build/reports/jacoco/
 ```
 
+### Release Workflow
+
+**File:** `.github/workflows/release.yml`
+
+**Trigger:** Tag push on master branch
+
+```yaml
+name: Release Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - master
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Java JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: "temurin"
+          cache: 'gradle'
+      
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+      
+      - name: Build Release APK
+        run: ./gradlew assembleRelease
+      
+      - name: Sign APK
+        run: |
+          # Signing handled by build.gradle.kts with secrets
+          echo "APK signed during build"
+      
+      - name: Rename APK
+        run: |
+          mv app/build/outputs/apk/release/app-release.apk \
+             app/build/outputs/apk/release/ClayModeler-${{ steps.version.outputs.VERSION }}.apk
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: app/build/outputs/apk/release/ClayModeler-*.apk
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: ClayModeler-${{ steps.version.outputs.VERSION }}
+          path: app/build/outputs/apk/release/ClayModeler-*.apk
+```
+
+**Secrets Required:**
+- `KEYSTORE_FILE`: Base64 encoded keystore
+- `KEYSTORE_PASSWORD`: Keystore password
+- `KEY_ALIAS`: Key alias
+- `KEY_PASSWORD`: Key password
+
+**Usage:**
+```bash
+# Create and push tag
+git tag -a v1.0.0 -m "Release version 1.0.0"
+git push origin v1.0.0
+
+# Workflow automatically:
+# 1. Builds release APK
+# 2. Signs APK
+# 3. Creates GitHub release
+# 4. Uploads APK to release
+```
+
+**Release Naming:**
+- Tag: `v1.0.0`
+- APK: `ClayModeler-1.0.0.apk`
+- Release: `v1.0.0`
+
 ### Build Configuration
 
 **build.gradle.kts (Project level):**

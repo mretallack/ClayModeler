@@ -519,6 +519,20 @@
 
 **Expected Outcome:** CI pipeline runs on push/PR
 
+### Task 9.15: Release Workflow
+- [ ] Create `.github/workflows/release.yml`
+- [ ] Configure trigger on tag push (v*)
+- [ ] Add release APK build job
+- [ ] Configure APK signing with GitHub secrets
+- [ ] Rename APK with version number
+- [ ] Create GitHub release automatically
+- [ ] Upload APK to release
+- [ ] Add release notes generation
+- [ ] Test workflow with test tag
+- [ ] Document release process in README
+
+**Expected Outcome:** Tagged commits automatically create GitHub releases with APK
+
 ## Phase 10: Release Preparation
 
 ### Task 10.1: Final Testing
@@ -580,7 +594,7 @@
 
 ## Summary
 
-**Total Tasks:** ~120
+**Total Tasks:** ~121
 **Estimated Duration:** 8-10 weeks
 **Team Size:** 1 developer
 

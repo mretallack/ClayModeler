@@ -25,6 +25,7 @@ class ModelRenderer(private val context: Context) : GLSurfaceView.Renderer {
     private val projectionMatrix = FloatArray(16)
     private val modelMatrix = FloatArray(16)
     private val normalMatrix = FloatArray(16)
+    private var aspectRatio = 1f
     
     private val camera = Camera()
     private val rayCaster = RayCaster()
@@ -46,9 +47,8 @@ class ModelRenderer(private val context: Context) : GLSurfaceView.Renderer {
         GLES30.glEnable(GLES30.GL_DEPTH_TEST)
         GLES30.glDepthFunc(GLES30.GL_LESS)
         
-        // Enable face culling
-        GLES30.glEnable(GLES30.GL_CULL_FACE)
-        GLES30.glCullFace(GLES30.GL_BACK)
+        // Disable face culling to show cross-sections when camera is inside model
+        GLES30.glDisable(GLES30.GL_CULL_FACE)
         
         // Create shader program
         shaderProgram = createShaderProgram()
@@ -69,10 +69,10 @@ class ModelRenderer(private val context: Context) : GLSurfaceView.Renderer {
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
         GLES30.glViewport(0, 0, width, height)
         
-        val ratio = width.toFloat() / height.toFloat()
+        aspectRatio = width.toFloat() / height.toFloat()
         
-        // Set up projection matrix with wider near/far range
-        Matrix.frustumM(projectionMatrix, 0, -ratio, ratio, -1f, 1f, 0.5f, 20f)
+        // Fixed projection matrix with wide range for large models
+        Matrix.frustumM(projectionMatrix, 0, -aspectRatio, aspectRatio, -1f, 1f, 1f, 50f)
         
         checkGLError("onSurfaceChanged")
     }

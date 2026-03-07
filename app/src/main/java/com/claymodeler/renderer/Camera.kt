@@ -39,7 +39,7 @@ class Camera {
     fun zoom(scaleFactor: Float) {
         val oldDistance = distance
         distance /= scaleFactor
-        distance = distance.coerceIn(2f, 10f)
+        distance = distance.coerceIn(3f, 20f)
         android.util.Log.d("Camera", "zoom: scaleFactor=$scaleFactor, oldDistance=$oldDistance, newDistance=$distance")
     }
     
@@ -56,4 +56,6 @@ class Camera {
         panX = 0f
         panY = 0f
     }
+    
+    fun getDistance(): Float = distance
 }

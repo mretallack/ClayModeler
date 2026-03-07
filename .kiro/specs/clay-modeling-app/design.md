@@ -1329,9 +1329,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
     
-    // OpenGL utilities
-    implementation("androidx.opengl:opengl:1.0.0")
-    
     // File I/O
     implementation("androidx.documentfile:documentfile:1.0.1")
     
@@ -1355,6 +1352,12 @@ dependencies {
 ```
 
 **Important:** No Google Play Services, Firebase, or analytics dependencies. App is fully offline and F-Droid compatible.
+
+**Note:** OpenGL ES 3.0 is built into Android SDK (API 18+), no external dependency needed. Use:
+```kotlin
+import android.opengl.GLSurfaceView
+import android.opengl.GLES30
+```
 
 ## Crash Reporting (ACRA)
 

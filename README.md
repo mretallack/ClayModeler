@@ -6,6 +6,9 @@ An Android app for creating 3D models that can be printed using clay.
 
 - 🎨 **Intuitive Sculpting** - Remove, add, and pull clay with natural touch gestures
 - 🖐️ **Drag-Based Sculpting** - Add tool responds to finger drag direction for intuitive modeling
+- 🛠️ **8 Sculpting Tools** - Remove, Add, Pull, Smooth, Flatten, Pinch, Inflate, and View mode
+- 💡 **Per-Model Lighting** - Adjust light position and intensity, saved with each model
+- 📚 **Example Models** - 5 built-in examples to learn sculpting techniques
 - 🔄 **Undo/Redo** - Up to 20 levels of undo history
 - 💾 **Save/Load** - Save your models in custom .clay format
 - 📤 **STL Export** - Export models for 3D printing (50-200mm)
@@ -129,6 +132,10 @@ adb emu kill
 - **Remove (🗑️)** - Carve clay inward toward hit point
 - **Add (➕)** - Build clay in drag direction (or outward if tapped)
 - **Pull (👆)** - Pull clay in drag direction
+- **Smooth (〰️)** - Average vertex positions for polished surfaces
+- **Flatten (▬)** - Create flat surfaces and planes
+- **Pinch (🤏)** - Pull vertices toward center for sharp details
+- **Inflate (🎈)** - Uniform expansion along normals for rounded forms
 - **View (👁️)** - Examine without editing
 
 ### Camera Controls
@@ -193,10 +200,14 @@ Standard STL for 3D printing:
 
 ## TODO
 
-1. ~~**Custom App Icon**~~ - ✅ Completed
-2. **Additional Tools** - Smooth, flatten, pinch, inflate tools
-3. **Lighting Controls** - Adjust light position and intensity for better visualization
-4. **Example Models** - Built-in example models accessible from menu
+1. ~~**Screenshots**~~ - ✅ Completed
+2. ~~**Custom App Icon**~~ - ✅ Completed
+3. ~~**Additional Tools**~~ - ✅ Completed (Smooth, Flatten, Pinch, Inflate)
+4. ~~**Lighting Controls**~~ - ✅ Completed (Per-model lighting with position and intensity)
+5. ~~**Example Models**~~ - ✅ Completed (5 built-in examples)
+6. **Enhanced Examples** - Create more detailed example models using the sculpting tools
+7. **Tool Presets** - Save and load tool size/strength configurations
+8. **Multiple Light Sources** - Add support for additional lights
 
 ## License
 

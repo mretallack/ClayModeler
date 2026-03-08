@@ -78,7 +78,8 @@
                     android:layout_height="56dp"
                     android:layout_marginBottom="4dp"
                     android:text="🗑️ Remove"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:tooltipText="Remove - Carve clay inward" />
 
                 <Button
                     android:id="@+id/btn_add"
@@ -86,7 +87,8 @@
                     android:layout_height="56dp"
                     android:layout_marginBottom="4dp"
                     android:text="➕ Add"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:tooltipText="Add - Build clay outward" />
 
                 <Button
                     android:id="@+id/btn_pull"
@@ -94,7 +96,8 @@
                     android:layout_height="56dp"
                     android:layout_marginBottom="4dp"
                     android:text="👆 Pull"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:tooltipText="Pull - Drag clay in direction" />
 
                 <Button
                     android:id="@+id/btn_smooth"
@@ -102,7 +105,8 @@
                     android:layout_height="56dp"
                     android:layout_marginBottom="4dp"
                     android:text="〰️ Smooth"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:tooltipText="Smooth - Polish surfaces" />
 
                 <Button
                     android:id="@+id/btn_flatten"
@@ -110,7 +114,8 @@
                     android:layout_height="56dp"
                     android:layout_marginBottom="4dp"
                     android:text="▬ Flatten"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:tooltipText="Flatten - Create flat surfaces" />
 
                 <Button
                     android:id="@+id/btn_pinch"
@@ -118,7 +123,8 @@
                     android:layout_height="56dp"
                     android:layout_marginBottom="4dp"
                     android:text="🤏 Pinch"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:tooltipText="Pinch - Sharp details" />
 
                 <Button
                     android:id="@+id/btn_inflate"
@@ -126,7 +132,8 @@
                     android:layout_height="56dp"
                     android:layout_marginBottom="4dp"
                     android:text="🎈 Inflate"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:tooltipText="Inflate - Uniform expansion" />
 
                 <Button
                     android:id="@+id/btn_view"
@@ -134,7 +141,8 @@
                     android:layout_height="56dp"
                     android:layout_marginBottom="16dp"
                     android:text="👁️ View"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:tooltipText="View - Examine without editing" />
 
                 <!-- Settings -->
                 <TextView

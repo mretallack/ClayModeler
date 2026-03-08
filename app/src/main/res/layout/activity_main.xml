@@ -71,6 +71,7 @@
                 android:background="@drawable/tool_button_background"
                 android:text="🗑️"
                 android:textSize="20sp"
+                android:tooltipText="Remove"
                 android:contentDescription="Remove clay tool" />
 
             <Button
@@ -81,6 +82,7 @@
                 android:background="@drawable/tool_button_background"
                 android:text="➕"
                 android:textSize="20sp"
+                android:tooltipText="Add"
                 android:contentDescription="Add clay tool" />
 
             <Button
@@ -91,6 +93,7 @@
                 android:background="@drawable/tool_button_background"
                 android:text="👆"
                 android:textSize="20sp"
+                android:tooltipText="Pull"
                 android:contentDescription="Pull clay tool" />
 
             <Button
@@ -101,6 +104,7 @@
                 android:background="@drawable/tool_button_background"
                 android:text="〰️"
                 android:textSize="20sp"
+                android:tooltipText="Smooth"
                 android:contentDescription="Smooth tool" />
 
             <Button
@@ -111,6 +115,7 @@
                 android:background="@drawable/tool_button_background"
                 android:text="▬"
                 android:textSize="20sp"
+                android:tooltipText="Flatten"
                 android:contentDescription="Flatten tool" />
 
             <Button
@@ -121,6 +126,7 @@
                 android:background="@drawable/tool_button_background"
                 android:text="🤏"
                 android:textSize="20sp"
+                android:tooltipText="Pinch"
                 android:contentDescription="Pinch tool" />
 
             <Button
@@ -131,6 +137,7 @@
                 android:background="@drawable/tool_button_background"
                 android:text="🎈"
                 android:textSize="20sp"
+                android:tooltipText="Inflate"
                 android:contentDescription="Inflate tool" />
 
             <Button
@@ -140,6 +147,7 @@
                 android:background="@drawable/tool_button_background"
                 android:text="👁️"
                 android:textSize="20sp"
+                android:tooltipText="View"
                 android:contentDescription="View mode" />
 
         </LinearLayout>

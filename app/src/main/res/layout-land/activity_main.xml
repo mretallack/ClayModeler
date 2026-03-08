@@ -172,6 +172,15 @@
                     android:max="100"
                     android:progress="50" />
 
+                <Button
+                    android:id="@+id/btn_symmetry"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="16dp"
+                    android:text="Symmetry: OFF"
+                    android:textSize="12sp"
+                    android:contentDescription="Toggle symmetry" />
+
             </LinearLayout>
         </ScrollView>
 

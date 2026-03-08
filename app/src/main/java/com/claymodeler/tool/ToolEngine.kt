@@ -10,6 +10,7 @@ class ToolEngine {
         set(value) {
             field = value.coerceIn(0.1f, 1.0f)
         }
+    var symmetryEnabled: Boolean = false
     
     fun setActiveTool(tool: Tool) {
         activeTool = tool

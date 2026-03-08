@@ -126,6 +126,13 @@ class MainActivity : AppCompatActivity() {
             viewModel.setTool(viewModel.viewModeTool)
         }
         
+        // Set up symmetry button
+        val btnSymmetry = findViewById<android.widget.Button>(R.id.btn_symmetry)
+        btnSymmetry?.setOnClickListener {
+            viewModel.toggleSymmetry()
+            btnSymmetry.text = if (viewModel.isSymmetryEnabled()) "Symmetry: ON" else "Symmetry: OFF"
+        }
+        
         // Observe undo/redo state
         viewModel.canUndo.observe(this) { canUndo ->
             btnUndo.isEnabled = canUndo
@@ -284,12 +291,13 @@ class MainActivity : AppCompatActivity() {
                                             com.claymodeler.model.Vector3(0f, 0f, 0f)
                                         }
                                         
-                                        tool.apply(
+                                        tool.applyWithSymmetry(
                                             model,
                                             hit.hitPoint,
                                             viewModel.toolEngine.strength,
                                             viewModel.toolEngine.brushSize,
-                                            dragDir
+                                            dragDir,
+                                            viewModel.toolEngine.symmetryEnabled
                                         )
                                         renderer.updateModel()
                                         previousHitPoint = hit.hitPoint

@@ -65,6 +65,16 @@ class ModelingViewModel : ViewModel() {
         toolEngine.strength = strength
     }
     
+    fun setSymmetryEnabled(enabled: Boolean) {
+        toolEngine.symmetryEnabled = enabled
+    }
+    
+    fun toggleSymmetry() {
+        toolEngine.symmetryEnabled = !toolEngine.symmetryEnabled
+    }
+    
+    fun isSymmetryEnabled(): Boolean = toolEngine.symmetryEnabled
+    
     fun saveState() {
         val currentModel = _model.value ?: return
         

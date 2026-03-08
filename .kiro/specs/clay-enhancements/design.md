@@ -407,19 +407,328 @@ Renderer displays example
 ## Testing Strategy
 
 ### Unit Tests
-- Test each tool's vertex modification algorithm
-- Test lighting settings persistence
-- Test example metadata parsing
+
+#### Tool Tests
+
+**SmoothToolTest.kt:**
+```kotlin
+class SmoothToolTest : FunSpec({
+    test("smooth tool averages neighboring vertices") {
+        // Create model with known vertex positions
+        // Apply smooth tool
+        // Verify vertices moved toward average of neighbors
+    }
+    
+    test("smooth tool respects strength parameter") {
+        // Apply with strength 0.5
+        // Verify displacement is half of maximum
+    }
+    
+    test("smooth tool respects radius") {
+        // Apply tool
+        // Verify only vertices within radius are affected
+    }
+    
+    test("smooth tool preserves overall volume") {
+        // Calculate volume before smoothing
+        // Apply smooth tool multiple times
+        // Verify volume change is minimal
+    }
+})
+```
+
+**FlattenToolTest.kt:**
+```kotlin
+class FlattenToolTest : FunSpec({
+    test("flatten tool creates planar surface") {
+        // Apply flatten tool
+        // Verify affected vertices lie on same plane
+    }
+    
+    test("flatten tool uses hit point normal for plane") {
+        // Apply on known surface
+        // Verify plane orientation matches surface normal
+    }
+    
+    test("flatten tool respects falloff") {
+        // Apply tool
+        // Verify vertices at edge are less flattened
+    }
+})
+```
+
+**PinchToolTest.kt:**
+```kotlin
+class PinchToolTest : FunSpec({
+    test("pinch tool pulls vertices toward center") {
+        // Apply pinch tool
+        // Verify all vertices moved toward hit point
+    }
+    
+    test("pinch tool uses quadratic falloff") {
+        // Apply tool
+        // Verify displacement follows (1-(d/r)²)² curve
+    }
+    
+    test("pinch tool creates sharp concentration") {
+        // Apply pinch
+        // Verify center vertices moved more than edge vertices
+    }
+})
+```
+
+**InflateToolTest.kt:**
+```kotlin
+class InflateToolTest : FunSpec({
+    test("inflate tool pushes along normals") {
+        // Apply inflate tool
+        // Verify vertices moved along their normals
+    }
+    
+    test("inflate tool ignores drag direction") {
+        // Apply with drag direction
+        // Verify movement is along normals, not drag
+    }
+    
+    test("inflate tool creates uniform expansion") {
+        // Apply tool
+        // Verify all affected vertices displaced equally
+    }
+})
+```
+
+#### Lighting Tests
+
+**LightingSettingsTest.kt:**
+```kotlin
+class LightingSettingsTest : FunSpec({
+    test("lighting settings save to preferences") {
+        // Create settings with custom values
+        // Save to SharedPreferences
+        // Verify values stored correctly
+    }
+    
+    test("lighting settings load from preferences") {
+        // Store values in SharedPreferences
+        // Load into LightingSettings
+        // Verify values match
+    }
+    
+    test("reset restores default values") {
+        // Modify settings
+        // Call reset()
+        // Verify defaults restored
+    }
+    
+    test("intensity clamped to valid range") {
+        // Set intensity to -1.0 and 5.0
+        // Verify clamped to 0.0-2.0 range
+    }
+})
+```
+
+#### Example Manager Tests
+
+**ExampleManagerTest.kt:**
+```kotlin
+class ExampleManagerTest : FunSpec({
+    test("load example list from JSON") {
+        // Parse examples.json
+        // Verify correct number of examples
+        // Verify metadata fields present
+    }
+    
+    test("load example model from assets") {
+        // Load sphere.clay
+        // Verify ClayModel created
+        // Verify vertices and faces loaded
+    }
+    
+    test("handle missing example file gracefully") {
+        // Attempt to load non-existent file
+        // Verify exception thrown or null returned
+    }
+    
+    test("validate example metadata") {
+        // Load examples
+        // Verify all have required fields
+        // Verify difficulty values are valid
+    }
+})
+```
 
 ### Integration Tests
-- Test tool switching and application
-- Test lighting changes with rendering
-- Test example loading workflow
 
-### Manual Testing
-- Verify tool visual effects match expectations
-- Verify lighting changes are intuitive
-- Verify examples load correctly and demonstrate techniques
+#### Tool Integration Tests
+
+**ToolIntegrationTest.kt:**
+```kotlin
+class ToolIntegrationTest : FunSpec({
+    test("all tools work with undo/redo") {
+        // Apply each new tool
+        // Undo
+        // Verify model restored
+        // Redo
+        // Verify tool reapplied
+    }
+    
+    test("tools respect brush size setting") {
+        // Set brush size to 0.5
+        // Apply each tool
+        // Verify affected area matches brush size
+    }
+    
+    test("tools respect strength setting") {
+        // Set strength to 0.3
+        // Apply each tool
+        // Verify displacement scaled appropriately
+    }
+    
+    test("switching between tools preserves model") {
+        // Apply tool A
+        // Switch to tool B
+        // Apply tool B
+        // Verify both modifications present
+    }
+})
+```
+
+#### Lighting Integration Tests
+
+**LightingIntegrationTest.kt:**
+```kotlin
+class LightingIntegrationTest : FunSpec({
+    test("lighting changes persist across app restart") {
+        // Set custom lighting
+        // Simulate app restart
+        // Verify lighting restored
+    }
+    
+    test("lighting updates apply to renderer") {
+        // Change light position
+        // Verify renderer receives update
+        // Verify shader uniforms updated
+    }
+    
+    test("reset lighting restores defaults") {
+        // Modify lighting
+        // Reset
+        // Verify renderer uses default values
+    }
+})
+```
+
+#### Example Loading Integration Tests
+
+**ExampleLoadingTest.kt:**
+```kotlin
+class ExampleLoadingTest : FunSpec({
+    test("loading example clears undo stack") {
+        // Make modifications
+        // Load example
+        // Verify undo stack empty
+    }
+    
+    test("loading example updates renderer") {
+        // Load example
+        // Verify renderer displays new model
+        // Verify vertex count matches example
+    }
+    
+    test("loading example prompts for unsaved changes") {
+        // Modify model
+        // Attempt to load example
+        // Verify warning dialog shown
+    }
+    
+    test("all example files load successfully") {
+        // Iterate through all examples
+        // Load each one
+        // Verify no errors
+        // Verify valid models created
+    }
+})
+```
+
+### UI Tests (Manual)
+
+#### Tool UI Tests
+- [ ] All 8 tools visible in toolbar (portrait and landscape)
+- [ ] Tool icons are distinct and recognizable
+- [ ] Selected tool highlights correctly
+- [ ] Tool cursor updates for each tool
+- [ ] Tools respond to touch immediately
+
+#### Lighting UI Tests
+- [ ] Lighting dialog accessible from menu
+- [ ] Sliders update lighting in real-time
+- [ ] Value labels show current settings
+- [ ] Reset button restores defaults
+- [ ] Dialog dismisses and saves settings
+
+#### Example Browser UI Tests
+- [ ] Examples menu option present
+- [ ] Example browser displays all examples
+- [ ] Example cards show name, description, difficulty
+- [ ] Difficulty badges color-coded correctly
+- [ ] Tapping example loads it
+- [ ] Unsaved work warning appears when needed
+
+### Performance Tests
+
+**ToolPerformanceTest.kt:**
+```kotlin
+class ToolPerformanceTest : FunSpec({
+    test("smooth tool maintains 30+ FPS") {
+        // Create high-poly model (10k vertices)
+        // Apply smooth tool continuously
+        // Measure frame time
+        // Verify < 33ms per frame
+    }
+    
+    test("all tools complete within 16ms") {
+        // Apply each tool
+        // Measure execution time
+        // Verify < 16ms (60 FPS target)
+    }
+})
+```
+
+**LightingPerformanceTest.kt:**
+```kotlin
+class LightingPerformanceTest : FunSpec({
+    test("lighting update completes within 16ms") {
+        // Change lighting
+        // Measure update time
+        // Verify < 16ms
+    }
+})
+```
+
+**ExampleLoadingPerformanceTest.kt:**
+```kotlin
+class ExampleLoadingPerformanceTest : FunSpec({
+    test("example loads within 500ms") {
+        // Load each example
+        // Measure load time
+        // Verify < 500ms
+    }
+})
+```
+
+### Test Coverage Goals
+
+- **Unit Tests:** 80%+ coverage for new classes
+- **Integration Tests:** All major workflows covered
+- **UI Tests:** All user-facing features manually verified
+- **Performance Tests:** All performance requirements validated
+
+### Continuous Integration
+
+- Run unit tests on every commit
+- Run integration tests on pull requests
+- Performance tests run nightly
+- UI tests run before releases
 
 ## Future Enhancements
 

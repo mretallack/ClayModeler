@@ -293,13 +293,13 @@
   - [x] If yes: Use drag direction for displacement
   - [x] If no: Fall back to surface normal (tap without drag)
 - [x] Clear previousHitPoint on ACTION_UP
-- [ ] Test drag-based sculpting
-  - [ ] Drag right on right side → clay extends right
-  - [ ] Drag up on top → clay extends up
-  - [ ] Tap without drag → clay extends along normal
-  - [ ] Verify smooth transitions between drag and tap
+- [x] Test drag-based sculpting
+  - [x] Drag right on right side → clay extends right
+  - [x] Drag up on top → clay extends up
+  - [x] Tap without drag → clay extends along normal
+  - [x] Verify smooth transitions between drag and tap
 
-**Expected Outcome:** Add tool responds to finger drag direction, making sculpting intuitive from any angle
+**Expected Outcome:** Add tool responds to finger drag direction, making sculpting intuitive from any angle ✅
 
 ### Task 6.7: Thumbnail Generation
 - [ ] Implement OpenGL screenshot capture

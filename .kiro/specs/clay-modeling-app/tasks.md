@@ -275,7 +275,33 @@
 
 **Expected Outcome:** Work auto-saves every minute ✅
 
-### Task 6.6: Thumbnail Generation
+### Task 6.6: Drag-Based Tool Direction
+
+**Problem:** Add tool only pushes along surface normals, making side sculpting unintuitive. Dragging finger right on the right side of the model produces no visible effect because displacement is perpendicular to view.
+
+**Solution:** Calculate 3D drag direction from finger movement and use it for Add tool displacement.
+
+- [x] Track previous hit point in MainActivity
+- [x] Calculate drag direction on ACTION_MOVE
+  - [x] Store previousHitPoint when tool first applied
+  - [x] On each move: `dragDirection = normalize(currentHit - previousHit)`
+  - [x] Handle case when previousHit is null (first touch)
+- [x] Pass drag direction to AddClayTool
+  - [x] Option A: Add dragDirection parameter to Tool.apply()
+- [x] Update AddClayTool to use drag direction
+  - [x] Check if drag direction is significant (length > 0.01f)
+  - [x] If yes: Use drag direction for displacement
+  - [x] If no: Fall back to surface normal (tap without drag)
+- [x] Clear previousHitPoint on ACTION_UP
+- [ ] Test drag-based sculpting
+  - [ ] Drag right on right side → clay extends right
+  - [ ] Drag up on top → clay extends up
+  - [ ] Tap without drag → clay extends along normal
+  - [ ] Verify smooth transitions between drag and tap
+
+**Expected Outcome:** Add tool responds to finger drag direction, making sculpting intuitive from any angle
+
+### Task 6.7: Thumbnail Generation
 - [ ] Implement OpenGL screenshot capture
 - [ ] Render model to offscreen framebuffer (256x256)
 - [ ] Convert framebuffer to Bitmap

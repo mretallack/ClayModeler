@@ -5,6 +5,7 @@ An Android app for creating 3D models that can be printed using clay.
 ## Features
 
 - 🎨 **Intuitive Sculpting** - Remove, add, and pull clay with natural touch gestures
+- 🖐️ **Drag-Based Sculpting** - Add tool responds to finger drag direction for intuitive modeling
 - 🔄 **Undo/Redo** - Up to 20 levels of undo history
 - 💾 **Save/Load** - Save your models in custom .clay format
 - 📤 **STL Export** - Export models for 3D printing (50-200mm)
@@ -119,8 +120,8 @@ adb emu kill
 
 ### Tools
 
-- **Remove (🗑️)** - Carve clay inward
-- **Add (➕)** - Build clay outward  
+- **Remove (🗑️)** - Carve clay inward toward hit point
+- **Add (➕)** - Build clay in drag direction (or outward if tapped)
 - **Pull (👆)** - Pull clay in drag direction
 - **View (👁️)** - Examine without editing
 

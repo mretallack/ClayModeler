@@ -96,23 +96,41 @@ interface Tool {
 }
 ```
 
+**Drag Direction Enhancement (Implemented):**
+
+Tools now respond to finger drag direction for intuitive sculpting:
+
+1. **Track 3D drag vector** - Calculate world-space movement between touches
+2. **Pass drag direction to tools** - Extended tool interface with dragDirection parameter
+3. **Smart direction selection** - Use drag when significant, fall back to surface normal
+
+**Implementation:**
+- MainActivity stores previous hit point
+- On ACTION_MOVE: calculates `dragDirection = currentHit - previousHit`
+- Passes dragDirection to all tools via Tool.apply()
+- AddClayTool uses dragDirection when length > 0.01f, otherwise uses surface normal
+
 **Tool Implementations:**
 
 **RemoveClayTool:**
 - Find vertices within radius of hit point
 - Move vertices inward along surface normal
 - Distance = strength * falloff(distance from center)
-- Falloff: smooth curve (1 - (d/r)²)
+- Falloff: linear (1 - d/r)
 
-**AddClayTool:**
+**AddClayTool (Enhanced with Drag Direction):**
 - Find vertices within radius of hit point
-- Move vertices outward along surface normal
-- Same falloff as remove tool
+- Calculate displacement direction:
+  - If drag direction exists and is significant: Use drag direction
+  - Else: Use surface normal (for tap without drag)
+- Move vertices along calculated direction
+- Falloff: linear (1 - d/r)
 
 **PullClayTool:**
 - Find vertices within radius of hit point
 - Move vertices in direction of drag vector
-- Blend drag direction with surface normal
+- Already uses drag direction (no changes needed)
+- Falloff: linear (1 - d/r)
 - Maintains surface smoothness
 
 **ViewModeTool:**

@@ -147,4 +147,13 @@ class ModelingViewModel : ViewModel() {
         cloned.normals.addAll(model.normals.map { it.copy() })
         return cloned
     }
+    
+    fun createNewModel() {
+        val newModel = ClayModel()
+        newModel.initialize(3)
+        _model.value = newModel
+        undoStack.clear()
+        redoStack.clear()
+        updateUndoRedoState()
+    }
 }

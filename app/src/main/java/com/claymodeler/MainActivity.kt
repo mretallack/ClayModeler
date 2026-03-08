@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
     private var lastTouchY = 0f
     private var pointerCount = 0
     private var hasAppliedTool = false
+    private var previousHitPoint: com.claymodeler.model.Vector3? = null
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -212,6 +213,7 @@ class MainActivity : AppCompatActivity() {
                 lastTouchX = event.x
                 lastTouchY = event.y
                 hasAppliedTool = false
+                previousHitPoint = null
                 
                 // Show cursor for edit tools on single touch
                 if (pointerCount == 1 && viewModel.toolEngine.isEditMode()) {
@@ -251,13 +253,22 @@ class MainActivity : AppCompatActivity() {
                                     val tool = viewModel.toolEngine.getActiveTool()
                                     
                                     if (model != null && tool != null) {
+                                        // Calculate drag direction
+                                        val dragDir = if (previousHitPoint != null) {
+                                            hit.hitPoint - previousHitPoint!!
+                                        } else {
+                                            com.claymodeler.model.Vector3(0f, 0f, 0f)
+                                        }
+                                        
                                         tool.apply(
                                             model,
                                             hit.hitPoint,
                                             viewModel.toolEngine.strength,
-                                            viewModel.toolEngine.brushSize
+                                            viewModel.toolEngine.brushSize,
+                                            dragDir
                                         )
                                         renderer.updateModel()
+                                        previousHitPoint = hit.hitPoint
                                     }
                                 }
                             }
@@ -325,28 +336,44 @@ class MainActivity : AppCompatActivity() {
     }
     
     override fun onCreateOptionsMenu(menu: android.view.Menu): Boolean {
-        menu.add(0, 1, 0, "Save")
-        menu.add(0, 2, 0, "Load")
-        menu.add(0, 3, 0, "Export STL")
+        menu.add(0, 1, 0, "New")
+        menu.add(0, 2, 0, "Save")
+        menu.add(0, 3, 0, "Load")
+        menu.add(0, 4, 0, "Export STL")
         return true
     }
     
     override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
         return when (item.itemId) {
             1 -> {
-                showSaveDialog()
+                showNewDialog()
                 true
             }
             2 -> {
-                showLoadDialog()
+                showSaveDialog()
                 true
             }
             3 -> {
+                showLoadDialog()
+                true
+            }
+            4 -> {
                 showExportDialog()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+    
+    private fun showNewDialog() {
+        android.app.AlertDialog.Builder(this)
+            .setTitle("New Model")
+            .setMessage("Create a new model? Unsaved changes will be lost.")
+            .setPositiveButton("Create") { _, _ ->
+                viewModel.createNewModel()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
     
     private fun showSaveDialog() {

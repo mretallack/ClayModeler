@@ -13,6 +13,12 @@ An Android app for creating 3D models that can be printed using clay.
 - 👁️ **View Mode** - Examine your model with camera controls
 - 🎯 **Visual Cursor** - See tool size and position in real-time
 
+## Screenshots
+
+<img src="screenshots/app-main-screen.jpg" width="300" alt="ClayModeler main screen showing sculpting tools and clay sphere">
+
+*Main screen with sculpting tools and adjustable brush size/strength*
+
 ## System Requirements
 
 - Android 8.0 (API 26) or higher
@@ -187,7 +193,7 @@ Standard STL for 3D printing:
 
 ## TODO
 
-1. **Custom App Icon** - Replace default icon with clay modeling themed icon
+1. ~~**Custom App Icon**~~ - ✅ Completed
 2. **Additional Tools** - Smooth, flatten, pinch, inflate tools
 3. **Lighting Controls** - Adjust light position and intensity for better visualization
 4. **Example Models** - Built-in example models accessible from menu

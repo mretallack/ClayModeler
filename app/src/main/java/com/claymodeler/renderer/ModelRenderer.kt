@@ -121,7 +121,12 @@ class ModelRenderer(private val context: Context) : GLSurfaceView.Renderer {
         GLES30.glUniformMatrix4fv(normalMatrixHandle, 1, false, normalMatrix, 0)
         
         val lightPosHandle = GLES30.glGetUniformLocation(shaderProgram, "uLightPos")
-        GLES30.glUniform3f(lightPosHandle, 5f, 5f, 5f)
+        val lightPos = model?.lightPosition ?: com.claymodeler.model.Vector3(2f, 3f, 2f)
+        GLES30.glUniform3f(lightPosHandle, lightPos.x, lightPos.y, lightPos.z)
+        
+        val lightIntensityHandle = GLES30.glGetUniformLocation(shaderProgram, "uLightIntensity")
+        val lightIntensity = model?.lightIntensity ?: 1f
+        GLES30.glUniform1f(lightIntensityHandle, lightIntensity)
         
         val viewPosHandle = GLES30.glGetUniformLocation(shaderProgram, "uViewPos")
         GLES30.glUniform3f(viewPosHandle, 0f, 0f, 4f)

@@ -363,7 +363,8 @@ class MainActivity : AppCompatActivity() {
         menu.add(0, 1, 0, "New")
         menu.add(0, 2, 0, "Save")
         menu.add(0, 3, 0, "Load")
-        menu.add(0, 4, 0, "Export STL")
+        menu.add(0, 4, 0, "Lighting")
+        menu.add(0, 5, 0, "Export STL")
         return true
     }
     
@@ -382,6 +383,10 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             4 -> {
+                showLightingDialog()
+                true
+            }
+            5 -> {
                 showExportDialog()
                 true
             }
@@ -434,6 +439,12 @@ class MainActivity : AppCompatActivity() {
                 android.widget.Toast.makeText(this, "Load failed: ${e.message}", android.widget.Toast.LENGTH_LONG).show()
             }
         }.show()
+    }
+    
+    private fun showLightingDialog() {
+        viewModel.model.value?.let { model ->
+            com.claymodeler.ui.LightingDialog(this, model).show()
+        }
     }
     
     private fun checkForAutosave() {

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Light Position X"
+        android:textSize="14sp" />
+
+    <SeekBar
+        android:id="@+id/slider_light_x"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:progress="70" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Light Position Y"
+        android:textSize="14sp"
+        android:layout_marginTop="16dp" />
+
+    <SeekBar
+        android:id="@+id/slider_light_y"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:progress="80" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Light Position Z"
+        android:textSize="14sp"
+        android:layout_marginTop="16dp" />
+
+    <SeekBar
+        android:id="@+id/slider_light_z"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:progress="70" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Light Intensity"
+        android:textSize="14sp"
+        android:layout_marginTop="16dp" />
+
+    <SeekBar
+        android:id="@+id/slider_light_intensity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:progress="50" />
+
+    <Button
+        android:id="@+id/btn_reset_lighting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"
+        android:text="Reset to Defaults" />
+
+</LinearLayout>

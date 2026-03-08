@@ -7,6 +7,14 @@ class ClayModel {
     val faces = mutableListOf<Face>()
     val normals = mutableListOf<Vector3>()
     
+    var lightPosition = Vector3(2f, 3f, 2f)
+    var lightIntensity = 1f
+    
+    fun resetLighting() {
+        lightPosition = Vector3(2f, 3f, 2f)
+        lightIntensity = 1f
+    }
+    
     fun initialize(subdivisions: Int = 3) {
         vertices.clear()
         faces.clear()

@@ -29,6 +29,10 @@ class FileManager(private val context: Context) {
                 appendLine("created=${System.currentTimeMillis()}")
                 appendLine("vertexCount=${model.vertices.size}")
                 appendLine("faceCount=${model.faces.size}")
+                appendLine("light_x=${model.lightPosition.x}")
+                appendLine("light_y=${model.lightPosition.y}")
+                appendLine("light_z=${model.lightPosition.z}")
+                appendLine("light_intensity=${model.lightIntensity}")
             }
             val metadataBytes = metadata.toByteArray(Charsets.UTF_8)
             
@@ -193,6 +197,14 @@ class FileManager(private val context: Context) {
             model.vertices.addAll(vertices)
             model.faces.addAll(faces)
             model.normals.addAll(normals)
+            
+            // Load lighting
+            model.lightPosition = Vector3(
+                metadataMap["light_x"]?.toFloatOrNull() ?: 2f,
+                metadataMap["light_y"]?.toFloatOrNull() ?: 3f,
+                metadataMap["light_z"]?.toFloatOrNull() ?: 2f
+            )
+            model.lightIntensity = metadataMap["light_intensity"]?.toFloatOrNull() ?: 1f
             
             return model
         }

@@ -22,7 +22,7 @@ class ToolLocalityTest : FunSpec({
         }
         
         val tool = AddClayTool()
-        tool.apply(model, hitPoint, strength = 1f, radius = 0.5f)
+        tool.apply(model, hitPoint, strength = 1f, radius = 0.5f, dragDirection = Vector3(0f, 0f, 0f))
         
         var maxMovement = 0f
         for ((i, originalVertex) in oppositeVertices) {
@@ -49,7 +49,7 @@ class ToolLocalityTest : FunSpec({
         }
         
         val tool = RemoveClayTool()
-        tool.apply(model, hitPoint, strength = 1f, radius = 0.5f)
+        tool.apply(model, hitPoint, strength = 1f, radius = 0.5f, dragDirection = Vector3(0f, 0f, 0f))
         
         var maxMovement = 0f
         for ((i, originalVertex) in oppositeVertices) {

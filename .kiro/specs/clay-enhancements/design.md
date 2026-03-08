@@ -160,26 +160,42 @@ vec3 finalColor = ambient + diffuse;
 - Intensity: 1.0
 
 **Persistence:**
-- Store in SharedPreferences
-- Load on app start
-- Apply to renderer
+- Store in ClayModel (per-model lighting)
+- Save/load with .clay file
+- New models start with default lighting
+- Each model remembers its optimal lighting setup
 
 #### Implementation Classes
 
-**LightingSettings.kt:**
+**ClayModel.kt Updates:**
 ```kotlin
-data class LightingSettings(
-    var position: Vector3 = Vector3(2f, 3f, 2f),
-    var intensity: Float = 1f
-) {
-    fun reset() {
-        position = Vector3(2f, 3f, 2f)
-        intensity = 1f
-    }
+class ClayModel {
+    // Existing fields...
+    var lightPosition: Vector3 = Vector3(2f, 3f, 2f)
+    var lightIntensity: Float = 1f
     
-    fun save(prefs: SharedPreferences)
-    fun load(prefs: SharedPreferences)
+    fun resetLighting() {
+        lightPosition = Vector3(2f, 3f, 2f)
+        lightIntensity = 1f
+    }
 }
+```
+
+**FileManager.kt Updates:**
+```kotlin
+// Save lighting to .clay file metadata
+metadata["light_x"] = model.lightPosition.x.toString()
+metadata["light_y"] = model.lightPosition.y.toString()
+metadata["light_z"] = model.lightPosition.z.toString()
+metadata["light_intensity"] = model.lightIntensity.toString()
+
+// Load lighting from .clay file metadata
+model.lightPosition = Vector3(
+    metadata["light_x"]?.toFloatOrNull() ?: 2f,
+    metadata["light_y"]?.toFloatOrNull() ?: 3f,
+    metadata["light_z"]?.toFloatOrNull() ?: 2f
+)
+model.lightIntensity = metadata["light_intensity"]?.toFloatOrNull() ?: 1f
 ```
 
 **ModelRenderer Updates:**
@@ -499,30 +515,57 @@ class InflateToolTest : FunSpec({
 
 #### Lighting Tests
 
-**LightingSettingsTest.kt:**
+**ClayModelLightingTest.kt:**
 ```kotlin
-class LightingSettingsTest : FunSpec({
-    test("lighting settings save to preferences") {
-        // Create settings with custom values
-        // Save to SharedPreferences
-        // Verify values stored correctly
+class ClayModelLightingTest : FunSpec({
+    test("new model has default lighting") {
+        val model = ClayModel()
+        model.initialize(3)
+        
+        model.lightPosition shouldBe Vector3(2f, 3f, 2f)
+        model.lightIntensity shouldBe 1f
     }
     
-    test("lighting settings load from preferences") {
-        // Store values in SharedPreferences
-        // Load into LightingSettings
-        // Verify values match
+    test("reset lighting restores defaults") {
+        val model = ClayModel()
+        model.lightPosition = Vector3(5f, 5f, 5f)
+        model.lightIntensity = 2f
+        
+        model.resetLighting()
+        
+        model.lightPosition shouldBe Vector3(2f, 3f, 2f)
+        model.lightIntensity shouldBe 1f
+    }
+})
+```
+
+**FileManagerLightingTest.kt:**
+```kotlin
+class FileManagerLightingTest : FunSpec({
+    test("save includes lighting in metadata") {
+        val model = ClayModel()
+        model.lightPosition = Vector3(1f, 2f, 3f)
+        model.lightIntensity = 1.5f
+        
+        // Save model
+        // Parse saved file
+        // Verify metadata contains light_x, light_y, light_z, light_intensity
     }
     
-    test("reset restores default values") {
-        // Modify settings
-        // Call reset()
-        // Verify defaults restored
+    test("load restores lighting from metadata") {
+        // Create .clay file with lighting metadata
+        val model = fileManager.load("test")
+        
+        model.lightPosition shouldBe Vector3(1f, 2f, 3f)
+        model.lightIntensity shouldBe 1.5f
     }
     
-    test("intensity clamped to valid range") {
-        // Set intensity to -1.0 and 5.0
-        // Verify clamped to 0.0-2.0 range
+    test("load uses defaults if lighting missing") {
+        // Create .clay file without lighting metadata
+        val model = fileManager.load("test")
+        
+        model.lightPosition shouldBe Vector3(2f, 3f, 2f)
+        model.lightIntensity shouldBe 1f
     }
 })
 ```
@@ -598,10 +641,19 @@ class ToolIntegrationTest : FunSpec({
 **LightingIntegrationTest.kt:**
 ```kotlin
 class LightingIntegrationTest : FunSpec({
-    test("lighting changes persist across app restart") {
+    test("lighting saves and loads with model") {
         // Set custom lighting
-        // Simulate app restart
+        // Save model
+        // Load model
         // Verify lighting restored
+    }
+    
+    test("different models have independent lighting") {
+        // Set lighting for model A
+        // Save model A
+        // Create new model B with different lighting
+        // Load model A
+        // Verify model A lighting restored (not model B's)
     }
     
     test("lighting updates apply to renderer") {
@@ -614,6 +666,11 @@ class LightingIntegrationTest : FunSpec({
         // Modify lighting
         // Reset
         // Verify renderer uses default values
+    }
+    
+    test("new model starts with default lighting") {
+        // Create new model
+        // Verify default lighting applied to renderer
     }
 })
 ```

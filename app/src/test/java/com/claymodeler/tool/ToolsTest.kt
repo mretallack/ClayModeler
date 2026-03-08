@@ -13,10 +13,10 @@ class ToolsTest : FunSpec({
         model.initialize(subdivisions = 0)
         
         val originalVertex = model.vertices[0].copy()
-        val hitPoint = model.vertices[0]
+        val hitPoint = model.vertices[0] + Vector3(0.1f, 0f, 0f) // Near vertex, not on it
         
         val tool = RemoveClayTool()
-        tool.apply(model, hitPoint, 1.0f, 0.5f)
+        tool.apply(model, hitPoint, 1.0f, 0.5f, Vector3(0f, 0f, 0f))
         
         val modifiedVertex = model.vertices[0]
         
@@ -32,7 +32,7 @@ class ToolsTest : FunSpec({
         val hitPoint = model.vertices[0]
         
         val tool = AddClayTool()
-        tool.apply(model, hitPoint, 1.0f, 0.5f)
+        tool.apply(model, hitPoint, 1.0f, 0.5f, Vector3(0f, 0f, 0f))
         
         val modifiedVertex = model.vertices[0]
         
@@ -46,9 +46,10 @@ class ToolsTest : FunSpec({
         
         val originalVertex = model.vertices[0].copy()
         val hitPoint = model.vertices[0]
+        val dragDirection = Vector3(0.1f, 0f, 0f)
         
         val tool = PullClayTool()
-        tool.apply(model, hitPoint, 1.0f, 0.5f)
+        tool.apply(model, hitPoint, 1.0f, 0.5f, dragDirection)
         
         val modifiedVertex = model.vertices[0]
         
@@ -65,7 +66,7 @@ class ToolsTest : FunSpec({
         val originalFarVertex = farVertex.copy()
         
         val tool = RemoveClayTool()
-        tool.apply(model, hitPoint, 1.0f, 0.1f) // Small radius
+        tool.apply(model, hitPoint, 1.0f, 0.1f, Vector3(0f, 0f, 0f)) // Small radius
         
         // Far vertex should not be affected
         val farVertexIndex = model.vertices.indexOf(farVertex)
@@ -81,7 +82,7 @@ class ToolsTest : FunSpec({
         
         val vertexDistances = model.vertices.map { (it - hitPoint).length() }
         
-        tool.apply(model, hitPoint, 1.0f, 0.5f)
+        tool.apply(model, hitPoint, 1.0f, 0.5f, Vector3(0f, 0f, 0f))
         
         // Vertices closer to hit point should move more
         // This is a basic sanity check
@@ -96,7 +97,7 @@ class ToolsTest : FunSpec({
         val hitPoint = model.vertices[0]
         
         val tool = ViewModeTool()
-        tool.apply(model, hitPoint, 1.0f, 0.5f)
+        tool.apply(model, hitPoint, 1.0f, 0.5f, Vector3(0f, 0f, 0f))
         
         // No vertices should have changed
         for (i in model.vertices.indices) {

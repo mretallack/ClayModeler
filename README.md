@@ -5,15 +5,15 @@ An Android app for creating 3D models that can be printed using clay.
 ## Features
 
 - 🎨 **Intuitive Sculpting** - Remove, add, and pull clay with natural touch gestures
-- 🖐️ **Drag-Based Sculpting** - Add tool responds to finger drag direction for intuitive modeling
+- 🖐️ **Drag-Based Sculpting** - Add and Pull tools respond to finger drag direction for intuitive modeling
 - 🛠️ **8 Sculpting Tools** - Remove, Add, Pull, Smooth, Flatten, Pinch, Inflate, and View mode
-- 💡 **Per-Model Lighting** - Adjust light position and intensity, saved with each model
+- 💡 **Per-Model Lighting** - Adjust light position (X/Y/Z) and intensity (0-2x), saved with each model
 - 📚 **Example Models** - 5 built-in examples to learn sculpting techniques
 - 🔄 **Undo/Redo** - Up to 20 levels of undo history
 - 💾 **Save/Load** - Save your models in custom .clay format
 - 📤 **STL Export** - Export models for 3D printing (50-200mm)
 - 💫 **Auto-Save** - Automatic backup every minute
-- 👁️ **View Mode** - Examine your model with camera controls
+- 👁️ **View Mode** - Examine your model with camera controls (pinch zoom, rotate, pan, double-tap reset)
 - 🎯 **Visual Cursor** - See tool size and position in real-time
 
 ## Screenshots
@@ -129,26 +129,30 @@ adb emu kill
 
 ### Tools
 
-- **Remove (🗑️)** - Carve clay inward toward hit point
-- **Add (➕)** - Build clay in drag direction (or outward if tapped)
-- **Pull (👆)** - Pull clay in drag direction
-- **Smooth (〰️)** - Average vertex positions for polished surfaces
-- **Flatten (▬)** - Create flat surfaces and planes
-- **Pinch (🤏)** - Pull vertices toward center for sharp details
-- **Inflate (🎈)** - Uniform expansion along normals for rounded forms
-- **View (👁️)** - Examine without editing
+- **Remove (🗑️)** - Carve clay inward toward hit point with smooth falloff
+- **Add (➕)** - Build clay in drag direction (or outward if tapped) - responds to finger movement
+- **Pull (👆)** - Pull clay in drag direction - follows your finger for precise control
+- **Smooth (〰️)** - Average neighboring vertices for polished surfaces using Laplacian smoothing
+- **Flatten (▬)** - Create flat surfaces and planes - defines plane on first touch
+- **Pinch (🤏)** - Pull vertices toward center with quadratic falloff for sharp details
+- **Inflate (🎈)** - Uniform expansion along surface normals for rounded, organic forms
+- **View (👁️)** - Examine without editing - rotate, zoom, pan, double-tap to reset
 
 ### Camera Controls
 
 - **Single finger drag** - Rotate camera (or edit in tool mode)
-- **Pinch** - Zoom in/out
+- **Pinch** - Zoom in/out (0.5x to 5x scale)
 - **Two finger drag** - Pan camera
-- **Double tap** - Reset camera (View mode only)
+- **Double tap** - Reset camera to default view (View mode only)
 
 ### Settings
 
 - **Brush Size** - Adjust tool radius (0.1 - 2.0)
 - **Strength** - Control modification intensity (0.1 - 1.0)
+- **Lighting** - Adjust light position (X/Y/Z: -5.0 to 5.0) and intensity (0.0 - 2.0)
+  - Default position: (2.0, 3.0, 2.0)
+  - Default intensity: 1.0
+  - Settings saved per-model
 
 ### File Formats
 

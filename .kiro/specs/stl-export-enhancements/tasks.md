@@ -24,14 +24,17 @@
 - [ ] Create `export/geometry/BaseGenerator.kt`
 - [ ] Implement circular base: generate cylinder mesh from radius, height, segment count
 - [ ] Implement rectangular base: generate box mesh from width, depth, height
+- [ ] Implement custom base: trace model outline at Z-min, offset by margin, extrude downward
 - [ ] Auto-calculate base dimensions from model bounding box + margin
 - [ ] Position base aligned to model's lowest Y point
 - [ ] Generate smooth fillet vertices at model-to-base transition
+- [ ] Validate base height is minimum 2mm, clamp if user sets lower
 - **Expected outcome**: Given a ClayModel and BaseConfig, produces a list of vertices and faces for the base
 
 ### Task 2.2: Keyring loop geometry generator
 - [ ] Create `export/geometry/LoopGenerator.kt`
 - [ ] Generate torus mesh from inner diameter and wall thickness
+- [ ] Enforce minimum 2mm wall thickness, clamp if user scales below
 - [ ] Generate reinforcement gusset connecting loop to model surface
 - [ ] Orient loop perpendicular to surface normal at PlacementResult position
 - [ ] Validate clearance: loop opening is not blocked by nearby model geometry
@@ -65,16 +68,26 @@
 - [ ] Handle miss (tap on empty space) by returning null
 - **Expected outcome**: Tap on 3D preview returns exact surface point and normal
 
-### Task 3.2: Placement controller with gestures
+### Task 3.2: Placement controller - core gestures
 - [ ] Create `export/placement/PlacementController.kt`
 - [ ] Handle single tap → place attachment via SurfacePicker
 - [ ] Handle drag → slide attachment along surface (continuous ray-cast)
 - [ ] Handle two-finger rotate → update PlacementResult.rotation
 - [ ] Handle pinch → update PlacementResult.scale within min/max bounds
+- [ ] Distinguish between placement gestures (touch on attachment) and camera gestures (touch on empty space)
+- **Expected outcome**: User can place, move, rotate, and resize attachments via touch
+
+### Task 3.2b: Placement controller - secondary gestures
 - [ ] Handle long press → snap to nearest preset position
 - [ ] Handle double tap → remove attachment
-- [ ] Distinguish between placement gestures (touch on attachment) and camera gestures (touch on empty space)
-- **Expected outcome**: Full gesture-based placement on 3D model
+- [ ] Handle three-finger tap → trigger undo via PlacementUndoManager
+- **Expected outcome**: Full secondary gesture set working
+
+### Task 3.2c: Snap guides
+- [ ] Implement optional snap-to-grid overlay on model surface
+- [ ] Toggle snap guides on/off in placement toolbar
+- [ ] Snap attachment position to nearest grid point when enabled
+- **Expected outcome**: Optional grid snapping for symmetrical placement
 
 ### Task 3.3: Placement validation
 - [ ] Create `export/placement/PlacementValidator.kt`
@@ -100,11 +113,12 @@
 
 ### Task 4.1: Wizard activity and navigation
 - [ ] Create `ui/wizard/ExportWizardActivity.kt` with ViewPager2 or FragmentStatePagerAdapter
+- [ ] Apply Material Design 3 theming (Material Components library)
 - [ ] Implement step indicator (dots or progress bar) showing current step
 - [ ] Implement Next/Back/Cancel navigation buttons
 - [ ] Preserve wizard state on device rotation (ViewModel)
 - [ ] Pass current ClayModel into wizard via intent/ViewModel
-- **Expected outcome**: Navigable 5-step wizard shell
+- **Expected outcome**: Navigable 5-step wizard shell with Material Design styling
 
 ### Task 4.2: Step 1 - Model Review fragment
 - [ ] Create `ui/wizard/ModelReviewFragment.kt` and layout
@@ -122,17 +136,33 @@
 - [ ] Validate attachment combinations (base + loop OK, base + hook warns)
 - **Expected outcome**: User selects attachment type or preset
 
-### Task 4.4: Step 3 - Configuration & Placement fragment
+### Task 4.4a: Step 3 - Configuration fragment shell
 - [ ] Create `ui/wizard/ConfigurationFragment.kt` and layout
-- [ ] Dynamic form: show relevant controls based on selected attachment type
-- [ ] **Base**: shape selector (circular/rectangular), width/depth/height sliders, margin slider
-- [ ] **Keyring**: size selector (small/medium/large), preset position buttons + touch-to-place 3D view
-- [ ] **Wall Hook**: type selector (keyhole/holes/loop), preset position buttons + touch-to-place 3D view
-- [ ] Integrate PlacementController for touch-to-place on the 3D preview
-- [ ] Show visual feedback: green valid, red invalid with reason text
-- [ ] Add undo/redo toolbar buttons
+- [ ] Dynamic form container: swap visible controls based on selected attachment type
+- [ ] Add undo/redo toolbar buttons wired to PlacementUndoManager
+- [ ] Add tooltips (info icons) on each option explaining what it does and suggested values
 - [ ] Small screen: collapse preset buttons to dropdown, enable precision mode
-- **Expected outcome**: User configures attachment and places it on model
+- **Expected outcome**: Configuration step shell that swaps content based on attachment type
+
+### Task 4.4b: Step 3 - Base configuration
+- [ ] Add base config controls: shape selector (circular/rectangular/custom), width/depth/height sliders, margin slider
+- [ ] Auto-populate suggested dimensions from model bounding box
+- [ ] Show live 3D preview of model with base (no touch-to-place needed, base auto-positions)
+- **Expected outcome**: User can configure base shape and dimensions
+
+### Task 4.4c: Step 3 - Keyring loop configuration & placement
+- [ ] Add keyring config controls: size selector (small/medium/large)
+- [ ] Add preset position buttons (top/left/right/front/back) around 3D preview
+- [ ] Integrate PlacementController for touch-to-place on 3D preview
+- [ ] Show visual feedback: green valid, red invalid with reason text
+- **Expected outcome**: User can configure and place keyring loop on model
+
+### Task 4.4d: Step 3 - Wall hook configuration & placement
+- [ ] Add hook config controls: type selector (keyhole/holes/loop)
+- [ ] Add preset position buttons around 3D preview
+- [ ] Integrate PlacementController for touch-to-place on 3D preview
+- [ ] Show visual feedback: green valid, red invalid with reason text
+- **Expected outcome**: User can configure and place wall hook on model
 
 ### Task 4.5: Step 4 - Preview fragment
 - [ ] Create `ui/wizard/PreviewFragment.kt` and layout
@@ -235,6 +265,7 @@
 - [ ] Handle non-manifold merge result: retry with simplified attachment, show error if still fails
 - [ ] Handle file write failure: check permissions, suggest alternative location
 - [ ] Handle out of memory: offer simplified export with reduced mesh
+- [ ] Handle preview generation failure: auto-recover by falling back to model-only preview, show toast
 - [ ] Show clear, actionable error messages throughout wizard
 - **Expected outcome**: All failure paths handled gracefully with user feedback
 

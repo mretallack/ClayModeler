@@ -237,10 +237,13 @@ Ensures exported STL is watertight:
 - Icon and description for each option
 - "Learn More" links with examples
 
-**Step 3: Configuration**
+**Step 3: Configuration & Placement**
 - Dynamic form based on selected attachment
 - Real-time validation of inputs
 - Suggested values based on model size
+- For keyring/hook: 3D touch-to-place interface (see Attachment Placement Interaction)
+- Quick placement preset buttons for common positions
+- For base: auto-positioned, user adjusts dimensions only
 
 **Step 4: Preview**
 - 3D view with orbit controls
@@ -254,6 +257,102 @@ Ensures exported STL is watertight:
 - Save location picker
 - "Save as Preset" checkbox
 - Export button
+
+### Attachment Placement Interaction
+
+The user needs an intuitive way to position attachments on their model. This uses a touch-based placement system on the 3D preview.
+
+#### Placement Modes
+
+**Quick Placement (Presets)**
+For users who want simplicity, offer preset positions:
+- TOP / BOTTOM / LEFT / RIGHT / FRONT / BACK
+- Displayed as labeled buttons around the 3D preview
+- Tapping a button snaps the attachment to that position on the model surface
+
+**Touch-to-Place (Custom)**
+For precise control, the user taps directly on the 3D model:
+
+1. User selects attachment type (loop, hook, etc.)
+2. Preview enters "placement mode" - model renders with a subtle grid overlay
+3. User taps a point on the model surface
+4. System performs ray-cast from touch point into the scene
+5. Ray intersects model mesh → nearest triangle face is identified
+6. Attachment preview appears at the intersection point, oriented along the face normal
+7. User can refine by:
+   - **Drag**: Slide attachment along model surface
+   - **Two-finger rotate**: Spin attachment around the surface normal
+   - **Pinch**: Adjust attachment size (within valid range)
+8. "Confirm Placement" button locks the position
+
+#### Ray-Cast Surface Selection
+
+```kotlin
+class SurfacePicker(private val mesh: Mesh) {
+    data class HitResult(
+        val position: Vector3,    // World-space hit point
+        val normal: Vector3,      // Surface normal at hit
+        val faceIndex: Int        // Triangle face index
+    )
+
+    fun pick(screenX: Float, screenY: Float, viewMatrix: Matrix4, projMatrix: Matrix4): HitResult? {
+        val ray = screenToRay(screenX, screenY, viewMatrix, projMatrix)
+        return intersectMesh(ray, mesh)
+    }
+}
+```
+
+#### Attachment Orientation
+
+Once placed on a surface:
+- **Keyring loop**: Oriented perpendicular to surface normal, ring plane faces outward so a keyring can slide through
+- **Wall hook (keyhole/holes)**: Oriented flush against surface, opening faces outward
+- **Hanging loop**: Oriented perpendicular to surface, ring plane is vertical for hanging
+- **Base**: Always snaps to the bottom, no custom placement needed (auto-aligns to lowest point)
+
+#### Visual Feedback During Placement
+
+- **Valid placement**: Attachment renders in green with a checkmark icon
+- **Invalid placement** (e.g. too close to edge, intersects geometry): Attachment renders in red with warning text explaining why
+- **Surface highlight**: The triangle under the user's finger highlights in blue during drag
+- **Ghost preview**: Semi-transparent attachment follows the user's finger before confirming
+- **Snap guides**: Optional grid snapping for symmetrical placement (toggle in settings)
+
+#### Placement Validation
+
+Before confirming placement, the system checks:
+- Attachment doesn't intersect with model interior
+- Minimum surface area at attachment point (avoids placing on thin edges)
+- Attachment is fully connected to model surface (no floating)
+- For keyring loops: ring opening is not blocked by nearby geometry
+- For wall hooks: sufficient flat area for mounting
+
+If validation fails, show a toast with the reason and suggest the nearest valid position.
+
+#### Placement Data Model
+
+```kotlin
+data class PlacementResult(
+    val position: Vector3,       // World-space position on model surface
+    val normal: Vector3,         // Surface normal at placement point
+    val rotation: Float = 0f,    // User-applied rotation around normal (degrees)
+    val scale: Float = 1f        // User-applied size adjustment
+)
+```
+
+This is stored in the relevant config (KeyringConfig, HookConfig) and passed to GeometryGenerator.
+
+#### Gesture Summary
+
+| Gesture | Action |
+|---------|--------|
+| Single tap | Place attachment at touch point |
+| Drag on attachment | Slide along model surface |
+| Two-finger rotate | Rotate attachment around surface normal |
+| Pinch on attachment | Resize attachment |
+| Tap empty space | Orbit camera (normal preview behavior) |
+| Long press | Reset attachment to nearest preset position |
+| Double tap attachment | Remove attachment |
 
 ### Preview Rendering
 

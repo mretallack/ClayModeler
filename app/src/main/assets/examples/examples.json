@@ -29,6 +29,12 @@
       "name": "Abstract Form",
       "description": "Creative use of all tools",
       "difficulty": "advanced"
+    },
+    {
+      "filename": "owl.clay",
+      "name": "Owl",
+      "description": "Detailed animal sculpture",
+      "difficulty": "advanced"
     }
   ]
 }

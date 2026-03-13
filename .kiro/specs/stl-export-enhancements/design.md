@@ -328,22 +328,374 @@ Store presets as JSON in app's private storage:
 ## Testing Strategy
 
 ### Unit Tests
-- Geometry generation algorithms
-- Mesh merging logic
-- Manifold validation
-- STL file writing
+
+#### GeometryGenerator Tests
+```kotlin
+class GeometryGeneratorTest {
+    @Test
+    fun `circular base generation creates correct vertex count`()
+    
+    @Test
+    fun `rectangular base aligns with model bounds`()
+    
+    @Test
+    fun `base height is minimum 2mm`()
+    
+    @Test
+    fun `base margin is applied correctly`()
+    
+    @Test
+    fun `keyring loop has correct inner diameter`()
+    
+    @Test
+    fun `keyring loop wall thickness is minimum 2mm`()
+    
+    @Test
+    fun `keyring loop orientation is perpendicular to surface`()
+    
+    @Test
+    fun `wall hook keyhole dimensions are correct`()
+    
+    @Test
+    fun `mounting holes are properly spaced`()
+    
+    @Test
+    fun `hanging loop is larger than keyring loop`()
+}
+```
+
+#### GeometryMerger Tests
+```kotlin
+class GeometryMergerTest {
+    @Test
+    fun `merge combines vertex lists correctly`()
+    
+    @Test
+    fun `merge adjusts face indices after combining`()
+    
+    @Test
+    fun `merge removes duplicate vertices`()
+    
+    @Test
+    fun `merge result is manifold`()
+    
+    @Test
+    fun `merge handles empty attachment mesh`()
+    
+    @Test
+    fun `merge throws exception for non-manifold result`()
+    
+    @Test
+    fun `merge preserves model normals`()
+}
+```
+
+#### Manifold Validation Tests
+```kotlin
+class ManifoldValidatorTest {
+    @Test
+    fun `valid mesh passes manifold check`()
+    
+    @Test
+    fun `mesh with hole fails manifold check`()
+    
+    @Test
+    fun `mesh with duplicate vertices fails check`()
+    
+    @Test
+    fun `mesh with inverted normals is detected`()
+    
+    @Test
+    fun `each edge is shared by exactly two faces`()
+    
+    @Test
+    fun `self-intersecting mesh is detected`()
+}
+```
+
+#### STLExporter Tests
+```kotlin
+class STLExporterTest {
+    @Test
+    fun `binary STL header is 80 bytes`()
+    
+    @Test
+    fun `triangle count is written correctly`()
+    
+    @Test
+    fun `normals are calculated correctly`()
+    
+    @Test
+    fun `vertices are written in correct order`()
+    
+    @Test
+    fun `file size matches expected size`()
+    
+    @Test
+    fun `export handles large meshes without OOM`()
+    
+    @Test
+    fun `export validates mesh before writing`()
+    
+    @Test
+    fun `export throws exception for invalid path`()
+}
+```
+
+#### Configuration Tests
+```kotlin
+class ExportConfigurationTest {
+    @Test
+    fun `default configuration has no attachment`()
+    
+    @Test
+    fun `base config validates minimum dimensions`()
+    
+    @Test
+    fun `keyring config rejects invalid position`()
+    
+    @Test
+    fun `hook config defaults to auto position`()
+    
+    @Test
+    fun `configuration serializes to JSON correctly`()
+    
+    @Test
+    fun `configuration deserializes from JSON correctly`()
+}
+```
 
 ### Integration Tests
-- Wizard navigation flow
-- Configuration persistence
-- Preview rendering
-- File export end-to-end
+
+#### Wizard Flow Tests
+```kotlin
+class ExportWizardFlowTest {
+    @Test
+    fun `wizard starts at model review step`()
+    
+    @Test
+    fun `next button advances to attachment selection`()
+    
+    @Test
+    fun `back button returns to previous step`()
+    
+    @Test
+    fun `cancel button exits wizard without saving`()
+    
+    @Test
+    fun `wizard skips configuration step when no attachment selected`()
+    
+    @Test
+    fun `wizard shows preview after configuration`()
+    
+    @Test
+    fun `wizard completes and exports file`()
+    
+    @Test
+    fun `wizard state is preserved on rotation`()
+}
+```
+
+#### Configuration Persistence Tests
+```kotlin
+class ConfigurationPersistenceTest {
+    @Test
+    fun `preset is saved to storage`()
+    
+    @Test
+    fun `preset is loaded from storage`()
+    
+    @Test
+    fun `multiple presets are stored correctly`()
+    
+    @Test
+    fun `preset with same name overwrites existing`()
+    
+    @Test
+    fun `deleted preset is removed from storage`()
+    
+    @Test
+    fun `corrupted preset file is handled gracefully`()
+}
+```
+
+#### Preview Rendering Tests
+```kotlin
+class PreviewRenderingTest {
+    @Test
+    fun `preview renders clay model`()
+    
+    @Test
+    fun `preview renders attachment in different color`()
+    
+    @Test
+    fun `preview updates when configuration changes`()
+    
+    @Test
+    fun `preview supports orbit controls`()
+    
+    @Test
+    fun `preview shows dimensions overlay`()
+    
+    @Test
+    fun `preview handles rendering errors gracefully`()
+    
+    @Test
+    fun `preview debounces rapid configuration changes`()
+}
+```
+
+#### End-to-End Export Tests
+```kotlin
+class EndToEndExportTest {
+    @Test
+    fun `export owl model with circular base`()
+    
+    @Test
+    fun `export owl model with keyring loop`()
+    
+    @Test
+    fun `export owl model with wall hook`()
+    
+    @Test
+    fun `export small model with size warning`()
+    
+    @Test
+    fun `export large model with size warning`()
+    
+    @Test
+    fun `export using saved preset`()
+    
+    @Test
+    fun `exported STL is valid and manifold`()
+    
+    @Test
+    fun `exported file size is reasonable`()
+}
+```
 
 ### Manual Testing
-- Test with various model sizes and shapes
-- Verify printability with actual 3D prints
-- Test on different Android devices
-- Validate STL files in multiple slicers
+
+#### Model Variety Tests
+- **Simple sphere**: Test with basic geometry
+- **Complex owl**: Test with detailed organic model
+- **Tall thin model**: Test base stability recommendations
+- **Wide flat model**: Test keyring loop placement
+- **Asymmetric model**: Test auto-positioning of hooks
+
+#### Size Variation Tests
+- **Tiny (10mm)**: Verify minimum size warnings
+- **Small (30mm)**: Test keyring loop sizing
+- **Medium (80mm)**: Test standard configurations
+- **Large (150mm)**: Test base proportions
+- **Huge (250mm)**: Verify performance and warnings
+
+#### Attachment Combinations
+- Base only
+- Keyring loop only
+- Wall hook only
+- Base + keyring loop (invalid combination - should warn)
+- Base + wall hook (invalid combination - should warn)
+
+#### 3D Print Validation
+For each attachment type, print and verify:
+- **Base**: Model stands upright without tipping
+- **Keyring loop**: Standard keyring fits through loop
+- **Wall hook (keyhole)**: Hangs securely on nail/screw
+- **Wall hook (holes)**: Screws fit mounting holes
+- **Wall hook (loop)**: Supports model weight when hanging
+
+#### Slicer Compatibility
+Import exported STL files into:
+- **Cura**: Verify no errors, slices correctly
+- **PrusaSlicer**: Check manifold validation passes
+- **Simplify3D**: Ensure proper mesh recognition
+- **OrcaSlicer**: Validate geometry integrity
+
+#### Device Testing
+Test on:
+- **Low-end device** (2GB RAM): Check performance, memory usage
+- **Mid-range device** (4GB RAM): Verify smooth operation
+- **High-end device** (8GB+ RAM): Test with complex models
+- **Tablet**: Verify UI layout on larger screen
+- **Different Android versions**: 10, 11, 12, 13, 14
+
+#### Edge Cases
+- **Empty model**: Should prevent export
+- **Single vertex model**: Should show error
+- **Non-manifold input**: Should attempt repair or warn
+- **Extremely high poly count**: Should offer simplification
+- **Model at origin**: Base generation should work
+- **Model far from origin**: Should center before adding base
+- **Inverted normals**: Should detect and offer to fix
+
+#### UI/UX Testing
+- **Wizard navigation**: All buttons work correctly
+- **Input validation**: Invalid values show helpful errors
+- **Preview responsiveness**: Smooth rotation and zoom
+- **Progress indicators**: Show during long operations
+- **Error messages**: Clear and actionable
+- **Tooltips**: Helpful and accurate
+- **Accessibility**: TalkBack navigation works
+
+#### Performance Benchmarks
+- **Preview generation**: < 500ms for typical model
+- **Export time**: < 5 seconds for typical model
+- **Memory usage**: < 200MB for typical model
+- **UI responsiveness**: No frame drops during preview
+- **File size**: Reasonable for mesh complexity
+
+### Automated Testing Pipeline
+
+#### Pre-commit Checks
+```bash
+./gradlew test                    # Run all unit tests
+./gradlew ktlintCheck            # Code style validation
+```
+
+#### CI/CD Pipeline
+```yaml
+- Run unit tests
+- Run integration tests
+- Generate code coverage report (target: 80%+)
+- Build APK
+- Run instrumented tests on emulator
+- Validate STL exports with external tool
+- Performance regression tests
+```
+
+#### Test Coverage Goals
+- **Unit tests**: 85%+ coverage
+- **Integration tests**: 70%+ coverage
+- **Critical paths**: 100% coverage (export, merge, validation)
+
+### Test Data
+
+#### Sample Models
+Maintain repository of test models:
+- `test_sphere.clay` - Simple 100-vertex sphere
+- `test_cube.clay` - Basic cube with 8 vertices
+- `test_owl.clay` - Complex 5000-vertex organic model
+- `test_thin.clay` - Tall thin model (stability test)
+- `test_flat.clay` - Wide flat model (base test)
+- `test_tiny.clay` - 5mm model (size warning test)
+- `test_huge.clay` - 300mm model (size warning test)
+
+#### Expected Outputs
+For each test model, maintain:
+- Expected STL file (for regression testing)
+- Expected vertex count after attachment
+- Expected file size range
+- Expected manifold validation result
+
+### Regression Testing
+
+After each change:
+1. Export all test models with all attachment types
+2. Compare output STL files with expected results
+3. Validate manifold status hasn't changed
+4. Check file sizes are within expected range
+5. Verify no performance degradation
 
 ## Implementation Considerations
 

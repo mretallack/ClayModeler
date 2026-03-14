@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "ClayModeler"
+rootProject.name = "ClayModeller"
 include(":app")

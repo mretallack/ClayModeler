@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <FrameLayout
+        android:id="@+id/preview_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/viewport_background"
+        android:contentDescription="3D model preview" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="12dp">
+
+        <TextView
+            android:id="@+id/txt_dimensions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dimensions: --"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/txt_mesh_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Vertices: -- Faces: --"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp" />
+
+        <TextView
+            android:id="@+id/txt_size_warning"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textColor="@color/accent"
+            android:layout_marginTop="4dp"
+            android:visibility="gone" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Orientation  ⓘ Tap edit button then drag to rotate"
+            android:textSize="12sp"
+            android:layout_marginTop="8dp" />
+
+        <Button
+            android:id="@+id/btn_rot_reset"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="Reset Orientation"
+            android:textSize="12sp"
+            android:minHeight="48dp"
+            android:layout_marginTop="4dp"
+            android:contentDescription="Reset model orientation" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Scale"
+            android:textSize="12sp"
+            android:layout_marginTop="8dp" />
+
+        <SeekBar
+            android:id="@+id/slider_scale"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:min="50"
+            android:max="300"
+            android:progress="100"
+            android:contentDescription="Model scale, 0.5x to 3x" />
+
+        <TextView
+            android:id="@+id/txt_scale_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1.0x"
+            android:textSize="12sp" />
+    </LinearLayout>
+</LinearLayout>

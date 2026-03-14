@@ -22,6 +22,39 @@ class STLExporter(private val context: Context) {
         if (validate) {
             validateMesh(model)
         }
+        return writeStl(model, filename, sizeInMm)
+    }
+
+    fun exportWithConfiguration(
+        model: ClayModel,
+        filename: String,
+        config: com.claymodeler.export.ExportConfiguration
+    ): String {
+        val finalModel = if (config.attachmentType != com.claymodeler.export.AttachmentType.NONE) {
+            val attachment = when (config.attachmentType) {
+                com.claymodeler.export.AttachmentType.BASE ->
+                    com.claymodeler.export.geometry.BaseGenerator().generate(model, config.baseConfig, config.sizeInMm)
+                com.claymodeler.export.AttachmentType.KEYRING_LOOP ->
+                    if (config.placement != null) com.claymodeler.export.geometry.LoopGenerator().generate(model, config.keyringConfig, config.placement!!, config.sizeInMm) else null
+                com.claymodeler.export.AttachmentType.WALL_HOOK ->
+                    if (config.placement != null) com.claymodeler.export.geometry.HookGenerator().generate(model, config.hookConfig, config.placement!!, config.sizeInMm) else null
+                com.claymodeler.export.AttachmentType.NONE -> null
+            }
+            if (attachment != null) {
+                val merged = com.claymodeler.export.geometry.GeometryMerger().merge(model, attachment)
+                val manifold = com.claymodeler.export.geometry.GeometryMerger().validateManifold(merged)
+                if (!manifold.valid) {
+                    android.util.Log.w("STLExporter", "Manifold issues: ${manifold.issues}")
+                }
+                merged
+            } else model
+        } else model
+
+        validateMesh(finalModel)
+        return writeStl(finalModel, filename, config.sizeInMm)
+    }
+
+    private fun writeStl(model: ClayModel, filename: String, sizeInMm: Float): String {
         
         // Calculate scale factor (model is normalized to ~1 unit)
         val scale = sizeInMm
@@ -32,7 +65,7 @@ class STLExporter(private val context: Context) {
         try {
             // Write header (80 bytes)
             val header = ByteArray(80)
-            "Binary STL exported from ClayModeler".toByteArray().copyInto(header)
+            "Binary STL exported from ClayModeller".toByteArray().copyInto(header)
             outputStream.write(header)
             
             // Write triangle count

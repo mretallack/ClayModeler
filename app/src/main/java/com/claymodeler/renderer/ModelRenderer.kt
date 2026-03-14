@@ -22,12 +22,12 @@ class ModelRenderer(private val context: Context) : GLSurfaceView.Renderer {
     private var glReady = false
     
     private val mvpMatrix = FloatArray(16)
-    private val projectionMatrix = FloatArray(16)
+    val projectionMatrix = FloatArray(16)
     private val modelMatrix = FloatArray(16)
     private val normalMatrix = FloatArray(16)
     private var aspectRatio = 1f
     
-    private val camera = Camera()
+    val camera = Camera()
     private val rayCaster = RayCaster()
     private var octree: Octree? = null
     
@@ -77,6 +77,16 @@ class ModelRenderer(private val context: Context) : GLSurfaceView.Renderer {
         checkGLError("onSurfaceChanged")
     }
     
+    var showGroundGrid = false
+    private var gridVbo = 0
+    private var gridNormalVbo = 0
+    private var gridVertexCount = 0
+    private var gridY = -1f
+    var showLightIndicator = false
+    private var lightIndicatorVbo = 0
+    private var lightIndicatorNormalVbo = 0
+    private var lightIndicatorVertexCount = 0
+
     override fun onDrawFrame(gl: GL10?) {
         // Clear buffers
         GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT or GLES30.GL_DEPTH_BUFFER_BIT)
@@ -152,6 +162,75 @@ class ModelRenderer(private val context: Context) : GLSurfaceView.Renderer {
         GLES30.glDisableVertexAttribArray(1)
         GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, 0)
         GLES30.glBindBuffer(GLES30.GL_ELEMENT_ARRAY_BUFFER, 0)
+
+        // Draw grid with identity model matrix (stays fixed as ground reference)
+        if (showGroundGrid && gridVbo != 0 && gridVertexCount > 0) {
+            val identityModel = FloatArray(16)
+            Matrix.setIdentityM(identityModel, 0)
+            val gridMvp = FloatArray(16)
+            val gridTemp = FloatArray(16)
+            Matrix.multiplyMM(gridTemp, 0, camera.getViewMatrix(), 0, identityModel, 0)
+            Matrix.multiplyMM(gridMvp, 0, projectionMatrix, 0, gridTemp, 0)
+
+            val mvpH = GLES30.glGetUniformLocation(shaderProgram, "uMVPMatrix")
+            GLES30.glUniformMatrix4fv(mvpH, 1, false, gridMvp, 0)
+            val modelH = GLES30.glGetUniformLocation(shaderProgram, "uModelMatrix")
+            GLES30.glUniformMatrix4fv(modelH, 1, false, identityModel, 0)
+            val colorH = GLES30.glGetUniformLocation(shaderProgram, "uClayColor")
+            GLES30.glUniform3f(colorH, 0.45f, 0.45f, 0.45f)
+
+            GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, gridVbo)
+            GLES30.glEnableVertexAttribArray(0)
+            GLES30.glVertexAttribPointer(0, 3, GLES30.GL_FLOAT, false, 0, 0)
+            GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, gridNormalVbo)
+            GLES30.glEnableVertexAttribArray(1)
+            GLES30.glVertexAttribPointer(1, 3, GLES30.GL_FLOAT, false, 0, 0)
+
+            GLES30.glDrawArrays(GLES30.GL_TRIANGLES, 0, gridVertexCount)
+
+            GLES30.glDisableVertexAttribArray(0)
+            GLES30.glDisableVertexAttribArray(1)
+            GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, 0)
+            GLES30.glGetError() // clear any grid errors
+        }
+
+        // Draw light indicator
+        if (showLightIndicator) {
+            if (lightIndicatorVbo == 0) buildLightIndicator()
+            val lightPos = model?.lightPosition ?: com.claymodeler.model.Vector3(2f, 3f, 2f)
+            val lightModel = FloatArray(16)
+            Matrix.setIdentityM(lightModel, 0)
+            Matrix.translateM(lightModel, 0, lightPos.x, lightPos.y, lightPos.z)
+            Matrix.scaleM(lightModel, 0, 0.15f, 0.15f, 0.15f)
+            val lightMvp = FloatArray(16)
+            val lightTemp = FloatArray(16)
+            Matrix.multiplyMM(lightTemp, 0, camera.getViewMatrix(), 0, lightModel, 0)
+            Matrix.multiplyMM(lightMvp, 0, projectionMatrix, 0, lightTemp, 0)
+
+            val mvpH = GLES30.glGetUniformLocation(shaderProgram, "uMVPMatrix")
+            GLES30.glUniformMatrix4fv(mvpH, 1, false, lightMvp, 0)
+            val modelH = GLES30.glGetUniformLocation(shaderProgram, "uModelMatrix")
+            GLES30.glUniformMatrix4fv(modelH, 1, false, lightModel, 0)
+            val colorH = GLES30.glGetUniformLocation(shaderProgram, "uClayColor")
+            GLES30.glUniform3f(colorH, 1f, 0.9f, 0.3f) // yellow
+            val lightIntH = GLES30.glGetUniformLocation(shaderProgram, "uLightIntensity")
+            GLES30.glUniform1f(lightIntH, 3f) // bright so it's always visible
+
+            GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, lightIndicatorVbo)
+            GLES30.glEnableVertexAttribArray(0)
+            GLES30.glVertexAttribPointer(0, 3, GLES30.GL_FLOAT, false, 0, 0)
+            GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, lightIndicatorNormalVbo)
+            GLES30.glEnableVertexAttribArray(1)
+            GLES30.glVertexAttribPointer(1, 3, GLES30.GL_FLOAT, false, 0, 0)
+            GLES30.glDrawArrays(GLES30.GL_TRIANGLES, 0, lightIndicatorVertexCount)
+            GLES30.glDisableVertexAttribArray(0)
+            GLES30.glDisableVertexAttribArray(1)
+            GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, 0)
+
+            // Restore model lighting
+            GLES30.glUniform1f(lightIntH, model?.lightIntensity ?: 1f)
+            GLES30.glGetError()
+        }
         
         checkGLError("onDrawFrame")
     }
@@ -159,6 +238,7 @@ class ModelRenderer(private val context: Context) : GLSurfaceView.Renderer {
     fun setModel(newModel: ClayModel) {
         model = newModel
         octree = Octree(newModel)
+        if (showGroundGrid) buildGridData(newModel)
         uploadModelToGPU()
     }
     
@@ -177,6 +257,25 @@ class ModelRenderer(private val context: Context) : GLSurfaceView.Renderer {
     
     fun getFps(): Float = currentFps
     
+    /** Rotate the model matrix (instant, no vertex recalculation) */
+    fun rotateModelMatrix(deltaX: Float, deltaY: Float) {
+        val temp = FloatArray(16)
+        Matrix.setIdentityM(temp, 0)
+        Matrix.rotateM(temp, 0, deltaX * 0.5f, 0f, 1f, 0f) // horizontal = Y axis
+        Matrix.rotateM(temp, 0, deltaY * 0.5f, 1f, 0f, 0f) // vertical = X axis
+        val result = FloatArray(16)
+        Matrix.multiplyMM(result, 0, temp, 0, modelMatrix, 0)
+        System.arraycopy(result, 0, modelMatrix, 0, 16)
+    }
+
+    /** Get current model matrix rotation angles for baking into vertices */
+    fun getModelMatrix(): FloatArray = modelMatrix.copyOf()
+
+    /** Reset model matrix to identity */
+    fun resetModelMatrix() {
+        Matrix.setIdentityM(modelMatrix, 0)
+    }
+
     fun rotateCamera(deltaX: Float, deltaY: Float) {
         camera.rotate(deltaX, deltaY)
     }
@@ -193,6 +292,146 @@ class ModelRenderer(private val context: Context) : GLSurfaceView.Renderer {
         camera.reset()
     }
     
+    private fun buildLightIndicator() {
+        val stacks = 8; val slices = 8
+        val verts = mutableListOf<Float>()
+        val norms = mutableListOf<Float>()
+        for (i in 0 until stacks) {
+            val phi1 = (Math.PI * i / stacks).toFloat()
+            val phi2 = (Math.PI * (i + 1) / stacks).toFloat()
+            for (j in 0 until slices) {
+                val th1 = (2 * Math.PI * j / slices).toFloat()
+                val th2 = (2 * Math.PI * (j + 1) / slices).toFloat()
+                fun v(p: Float, t: Float) {
+                    val x = kotlin.math.sin(p) * kotlin.math.cos(t)
+                    val y = kotlin.math.cos(p)
+                    val z = kotlin.math.sin(p) * kotlin.math.sin(t)
+                    verts.addAll(listOf(x, y, z)); norms.addAll(listOf(x, y, z))
+                }
+                v(phi1, th1); v(phi2, th1); v(phi2, th2)
+                v(phi1, th1); v(phi2, th2); v(phi1, th2)
+            }
+        }
+        lightIndicatorVertexCount = verts.size / 3
+        val vBuf = java.nio.ByteBuffer.allocateDirect(verts.size * 4).order(java.nio.ByteOrder.nativeOrder()).asFloatBuffer()
+        vBuf.put(verts.toFloatArray()); vBuf.position(0)
+        val nBuf = java.nio.ByteBuffer.allocateDirect(norms.size * 4).order(java.nio.ByteOrder.nativeOrder()).asFloatBuffer()
+        nBuf.put(norms.toFloatArray()); nBuf.position(0)
+        val b = IntArray(2); GLES30.glGenBuffers(2, b, 0)
+        lightIndicatorVbo = b[0]; lightIndicatorNormalVbo = b[1]
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, lightIndicatorVbo)
+        GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER, verts.size * 4, vBuf, GLES30.GL_STATIC_DRAW)
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, lightIndicatorNormalVbo)
+        GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER, norms.size * 4, nBuf, GLES30.GL_STATIC_DRAW)
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, 0)
+    }
+
+    private fun buildGridData(m: ClayModel) {
+        var minY = Float.MAX_VALUE
+        var minX = Float.MAX_VALUE; var maxX = -Float.MAX_VALUE
+        var minZ = Float.MAX_VALUE; var maxZ = -Float.MAX_VALUE
+        for (v in m.vertices) {
+            if (v.y < minY) minY = v.y
+            if (v.x < minX) minX = v.x; if (v.x > maxX) maxX = v.x
+            if (v.z < minZ) minZ = v.z; if (v.z > maxZ) maxZ = v.z
+        }
+        val extent = maxOf(maxX - minX, maxZ - minZ) * 1.5f
+        val cx = (minX + maxX) / 2f
+        val cz = (minZ + maxZ) / 2f
+        val lines = 11
+        val step = extent / (lines - 1)
+        val half = extent / 2f
+        val t = extent * 0.005f
+        val y = minY - 0.002f
+
+        val verts = mutableListOf<Float>()
+        val norms = mutableListOf<Float>()
+        for (i in 0 until lines) {
+            val offset = -half + i * step
+            // Along X
+            verts.addAll(listOf(cx - half, y, cz + offset - t, cx + half, y, cz + offset - t, cx + half, y, cz + offset + t))
+            verts.addAll(listOf(cx - half, y, cz + offset - t, cx + half, y, cz + offset + t, cx - half, y, cz + offset + t))
+            // Along Z
+            verts.addAll(listOf(cx + offset - t, y, cz - half, cx + offset + t, y, cz - half, cx + offset + t, y, cz + half))
+            verts.addAll(listOf(cx + offset - t, y, cz - half, cx + offset + t, y, cz + half, cx + offset - t, y, cz + half))
+            repeat(12) { norms.addAll(listOf(0f, 1f, 0f)) }
+        }
+        gridVertexCount = verts.size / 3
+
+        val vertBuf = java.nio.ByteBuffer.allocateDirect(verts.size * 4).order(java.nio.ByteOrder.nativeOrder()).asFloatBuffer()
+        vertBuf.put(verts.toFloatArray()); vertBuf.position(0)
+        val normBuf = java.nio.ByteBuffer.allocateDirect(norms.size * 4).order(java.nio.ByteOrder.nativeOrder()).asFloatBuffer()
+        normBuf.put(norms.toFloatArray()); normBuf.position(0)
+
+        if (gridVbo == 0) {
+            val b = IntArray(2); GLES30.glGenBuffers(2, b, 0); gridVbo = b[0]; gridNormalVbo = b[1]
+        }
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, gridVbo)
+        GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER, verts.size * 4, vertBuf, GLES30.GL_STATIC_DRAW)
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, gridNormalVbo)
+        GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER, norms.size * 4, normBuf, GLES30.GL_STATIC_DRAW)
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, 0)
+    }
+
+    private fun uploadGrid(m: ClayModel) {
+        if (!glReady) return
+        var minY = Float.MAX_VALUE
+        var minX = Float.MAX_VALUE; var maxX = -Float.MAX_VALUE
+        var minZ = Float.MAX_VALUE; var maxZ = -Float.MAX_VALUE
+        for (v in m.vertices) {
+            if (v.y < minY) minY = v.y
+            if (v.x < minX) minX = v.x; if (v.x > maxX) maxX = v.x
+            if (v.z < minZ) minZ = v.z; if (v.z > maxZ) maxZ = v.z
+        }
+        gridY = minY
+        val extent = maxOf(maxX - minX, maxZ - minZ) * 1.5f
+        val cx = (minX + maxX) / 2f
+        val cz = (minZ + maxZ) / 2f
+        val lines = 11
+        val step = extent / (lines - 1)
+        val half = extent / 2f
+        val thickness = extent * 0.004f // thin but visible
+
+        // Build grid as flat quads (2 triangles each)
+        val verts = mutableListOf<Float>()
+        val norms = mutableListOf<Float>()
+        fun addQuad(x1: Float, z1: Float, x2: Float, z2: Float, dx: Float, dz: Float) {
+            // Two triangles forming a thin quad
+            val y = minY - 0.001f // slightly below model to avoid z-fighting
+            verts.addAll(listOf(x1 - dz, y, z1 + dx,  x2 - dz, y, z2 + dx,  x2 + dz, y, z2 - dx))
+            verts.addAll(listOf(x1 - dz, y, z1 + dx,  x2 + dz, y, z2 - dx,  x1 + dz, y, z1 - dx))
+            repeat(6) { norms.addAll(listOf(0f, 1f, 0f)) }
+        }
+
+        for (i in 0 until lines) {
+            val offset = -half + i * step
+            // Line along X (thickness in Z)
+            addQuad(cx - half, cz + offset, cx + half, cz + offset, 0f, thickness)
+            // Line along Z (thickness in X)
+            addQuad(cx + offset, cz - half, cx + offset, cz + half, thickness, 0f)
+        }
+
+        gridVertexCount = verts.size / 3
+
+        val vertBuf = java.nio.ByteBuffer.allocateDirect(verts.size * 4)
+            .order(java.nio.ByteOrder.nativeOrder()).asFloatBuffer()
+        vertBuf.put(verts.toFloatArray()); vertBuf.position(0)
+
+        val normBuf = java.nio.ByteBuffer.allocateDirect(norms.size * 4)
+            .order(java.nio.ByteOrder.nativeOrder()).asFloatBuffer()
+        normBuf.put(norms.toFloatArray()); normBuf.position(0)
+
+        if (gridVbo == 0) {
+            val b = IntArray(2); GLES30.glGenBuffers(2, b, 0)
+            gridVbo = b[0]; gridNormalVbo = b[1]
+        }
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, gridVbo)
+        GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER, verts.size * 4, vertBuf, GLES30.GL_STATIC_DRAW)
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, gridNormalVbo)
+        GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER, norms.size * 4, normBuf, GLES30.GL_STATIC_DRAW)
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, 0)
+    }
+
     private fun uploadModelToGPU() {
         if (!glReady) return
         val m = model ?: return

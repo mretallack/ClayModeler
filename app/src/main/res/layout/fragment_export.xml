@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Export Summary"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:id="@+id/txt_summary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:layout_marginBottom="16dp" />
+
+    <EditText
+        android:id="@+id/edit_filename"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="File name"
+        android:inputType="text"
+        android:layout_marginBottom="16dp"
+        android:minHeight="48dp"
+        android:contentDescription="Export file name" />
+
+    <CheckBox
+        android:id="@+id/chk_save_preset"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Save as preset"
+        android:minHeight="48dp" />
+
+    <EditText
+        android:id="@+id/edit_preset_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Preset name"
+        android:inputType="text"
+        android:visibility="gone"
+        android:minHeight="48dp"
+        android:contentDescription="Preset name" />
+
+    <ProgressBar
+        android:id="@+id/progress_export"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:visibility="gone"
+        android:layout_marginTop="16dp" />
+
+    <TextView
+        android:id="@+id/txt_result"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:layout_marginTop="16dp"
+        android:visibility="gone" />
+</LinearLayout>

@@ -94,12 +94,14 @@ class PullClayTool : Tool {
 }
 
 class ViewModeTool : Tool {
-    override fun apply(model: ClayModel, hitPoint: Vector3, strength: Float, radius: Float, dragDirection: Vector3) {
-        // View mode doesn't modify the model
-    }
-    
+    override fun apply(model: ClayModel, hitPoint: Vector3, strength: Float, radius: Float, dragDirection: Vector3) {}
     override fun getName() = "View"
-    
+    override fun isEditTool() = false
+}
+
+class LightModeTool : Tool {
+    override fun apply(model: ClayModel, hitPoint: Vector3, strength: Float, radius: Float, dragDirection: Vector3) {}
+    override fun getName() = "Light"
     override fun isEditTool() = false
 }
 

@@ -33,6 +33,7 @@ class ModelingViewModel : ViewModel() {
     val pinchTool = PinchTool()
     val inflateTool = InflateTool()
     val viewModeTool = ViewModeTool()
+    val lightModeTool = LightModeTool()
     
     private val undoStack = ArrayDeque<ClayModel>(20)
     private val redoStack = ArrayDeque<ClayModel>(20)

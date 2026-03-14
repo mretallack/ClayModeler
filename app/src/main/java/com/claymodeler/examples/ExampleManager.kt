@@ -44,18 +44,25 @@ class ExampleManager(private val context: Context) {
                 val bytes = inputStream.readBytes()
                 val buffer = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN)
                 
-                // Read header
+                // Read header - detect byte order from magic
+                // Detect byte order from first byte ('Y'=LE, 'C'=BE)
+                val b0 = bytes[0]
+                val headerOrder = if (b0 == 'Y'.code.toByte()) ByteOrder.LITTLE_ENDIAN else ByteOrder.BIG_ENDIAN
+                buffer.order(headerOrder)
+
                 val magic = buffer.int
-                if (magic != 0x434C4159) return null
-                
                 val version = buffer.int
-                if (version != 1) return null
-                
+                android.util.Log.d("ExampleManager", "Loading $filename headerOrder=$headerOrder version=$version")
+                if (version != 1) { android.util.Log.e("ExampleManager", "Bad version $version"); return null }
+
                 val metadataSize = buffer.int
                 buffer.int // checksum
-                
+
                 // Skip metadata
                 buffer.position(buffer.position() + metadataSize)
+
+                // Data is always little-endian regardless of header byte order
+                buffer.order(ByteOrder.LITTLE_ENDIAN)
                 
                 // Parse metadata to get counts
                 val metadataBytes = bytes.copyOfRange(16, 16 + metadataSize)
@@ -104,6 +111,7 @@ class ExampleManager(private val context: Context) {
                 }
             }
         } catch (e: Exception) {
+            android.util.Log.e("ExampleManager", "Failed to load $filename", e)
             null
         }
     }

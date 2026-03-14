@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- 3D Preview (top half) -->
+    <FrameLayout
+        android:id="@+id/config_preview_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/viewport_background"
+        android:contentDescription="3D preview of model with attachment" />
+
+    <!-- Controls (bottom half, scrollable) -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Undo/Redo toolbar for placement -->
+        <LinearLayout
+            android:id="@+id/placement_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/btn_placement_undo"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:text="↶"
+                android:textSize="20sp"
+                android:contentDescription="Undo placement" />
+
+            <Button
+                android:id="@+id/btn_placement_redo"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:text="↷"
+                android:textSize="20sp"
+                android:contentDescription="Redo placement" />
+
+            <CheckBox
+                android:id="@+id/chk_snap"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Snap to grid"
+                android:layout_marginStart="16dp"
+                android:minHeight="48dp" />
+        </LinearLayout>
+
+        <!-- No attachment message -->
+        <TextView
+            android:id="@+id/txt_no_attachment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No attachment selected. Press Next to continue."
+            android:textSize="16sp"
+            android:visibility="gone" />
+
+        <!-- Base config section -->
+        <LinearLayout
+            android:id="@+id/section_base"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Base Shape"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ⓘ Choose the shape of the base plate. Circular works best for round models."
+                android:textSize="11sp"
+                android:textColor="#888888"
+                android:layout_marginBottom="4dp" />
+
+            <RadioGroup
+                android:id="@+id/radio_base_shape"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/radio_circular"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:text="Circular"
+                    android:minHeight="48dp" />
+
+                <RadioButton
+                    android:id="@+id/radio_rectangular"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:text="Rectangular"
+                    android:minHeight="48dp" />
+
+                <RadioButton
+                    android:id="@+id/radio_custom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:text="Custom"
+                    android:minHeight="48dp" />
+            </RadioGroup>
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Height (mm)  ⓘ Minimum 2mm. 3-5mm recommended for stability."
+                android:textSize="12sp" android:layout_marginTop="8dp" />
+            <SeekBar android:id="@+id/slider_base_height" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:min="2" android:max="20" android:progress="3"
+                android:contentDescription="Base height in millimeters" />
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Margin (mm)  ⓘ Extra space around model edge. 2mm is a good default."
+                android:textSize="12sp" android:layout_marginTop="8dp" />
+            <SeekBar android:id="@+id/slider_base_margin" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:min="0" android:max="10" android:progress="2"
+                android:contentDescription="Base margin in millimeters" />
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Overlap (mm)  ⓘ How far base merges into model. More = stronger joint."
+                android:textSize="12sp" android:layout_marginTop="8dp" />
+            <SeekBar android:id="@+id/slider_base_overlap" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:min="0" android:max="15" android:progress="3"
+                android:contentDescription="Base overlap in millimeters" />
+        </LinearLayout>
+
+        <!-- Keyring config section -->
+        <LinearLayout
+            android:id="@+id/section_keyring"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Loop Size"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ⓘ Small: tight fit. Medium: standard keyring. Large: carabiner clip."
+                android:textSize="11sp"
+                android:textColor="#888888"
+                android:layout_marginBottom="4dp" />
+
+            <RadioGroup
+                android:id="@+id/radio_loop_size"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <RadioButton android:id="@+id/radio_small" android:layout_width="wrap_content"
+                    android:layout_height="48dp" android:text="Small" android:minHeight="48dp" />
+                <RadioButton android:id="@+id/radio_medium" android:layout_width="wrap_content"
+                    android:layout_height="48dp" android:text="Medium" android:minHeight="48dp" />
+                <RadioButton android:id="@+id/radio_large" android:layout_width="wrap_content"
+                    android:layout_height="48dp" android:text="Large" android:minHeight="48dp" />
+            </RadioGroup>
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Ring Thickness (mm)  ⓘ Thicker = stronger. 2-4mm recommended."
+                android:textSize="12sp" android:layout_marginTop="8dp" />
+            <SeekBar android:id="@+id/slider_ring_thickness" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:min="2" android:max="8" android:progress="3"
+                android:contentDescription="Ring thickness in millimeters" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Position"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginTop="8dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <Button android:id="@+id/btn_pos_top" android:layout_width="wrap_content"
+                    android:layout_height="48dp" android:text="Top" android:minHeight="48dp" />
+                <Button android:id="@+id/btn_pos_left" android:layout_width="wrap_content"
+                    android:layout_height="48dp" android:text="Left" android:minHeight="48dp" />
+                <Button android:id="@+id/btn_pos_right" android:layout_width="wrap_content"
+                    android:layout_height="48dp" android:text="Right" android:minHeight="48dp" />
+                <Button android:id="@+id/btn_pos_front" android:layout_width="wrap_content"
+                    android:layout_height="48dp" android:text="Front" android:minHeight="48dp" />
+                <Button android:id="@+id/btn_pos_back" android:layout_width="wrap_content"
+                    android:layout_height="48dp" android:text="Back" android:minHeight="48dp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/txt_keyring_validation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:layout_marginTop="8dp"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <!-- Hook config section -->
+        <LinearLayout
+            android:id="@+id/section_hook"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hook Type"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ⓘ Keyhole: standard wall screw. Holes: use screws directly. Loop: hang from hook."
+                android:textSize="11sp"
+                android:textColor="#888888"
+                android:layout_marginBottom="4dp" />
+
+            <RadioGroup
+                android:id="@+id/radio_hook_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RadioButton android:id="@+id/radio_keyhole" android:layout_width="match_parent"
+                    android:layout_height="48dp" android:text="Keyhole Slot" android:minHeight="48dp" />
+                <RadioButton android:id="@+id/radio_holes" android:layout_width="match_parent"
+                    android:layout_height="48dp" android:text="Mounting Holes" android:minHeight="48dp" />
+                <RadioButton android:id="@+id/radio_hanging" android:layout_width="match_parent"
+                    android:layout_height="48dp" android:text="Hanging Loop" android:minHeight="48dp" />
+            </RadioGroup>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Position"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginTop="8dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <Button android:id="@+id/btn_hook_auto" android:layout_width="wrap_content"
+                    android:layout_height="48dp" android:text="Auto" android:minHeight="48dp" />
+                <Button android:id="@+id/btn_hook_top" android:layout_width="wrap_content"
+                    android:layout_height="48dp" android:text="Top" android:minHeight="48dp" />
+                <Button android:id="@+id/btn_hook_center" android:layout_width="wrap_content"
+                    android:layout_height="48dp" android:text="Center" android:minHeight="48dp" />
+                <Button android:id="@+id/btn_hook_bottom" android:layout_width="wrap_content"
+                    android:layout_height="48dp" android:text="Bottom" android:minHeight="48dp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/txt_hook_validation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:layout_marginTop="8dp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
+</LinearLayout>

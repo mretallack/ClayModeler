@@ -9,6 +9,7 @@ import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.claymodeler.renderer.ModelRenderer
+import com.claymodeler.tool.LightModeTool
 import com.claymodeler.viewmodel.ModelingViewModel
 
 class MainActivity : AppCompatActivity() {
@@ -30,6 +31,10 @@ class MainActivity : AppCompatActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Set status bar color to match toolbar
+        window.statusBarColor = resources.getColor(R.color.primary_dark, theme)
+        
         setContentView(R.layout.activity_main)
         
         // Initialize ViewModel
@@ -49,10 +54,12 @@ class MainActivity : AppCompatActivity() {
             permissionManager.requestStoragePermission()
         }
         
-        // Set up toolbar
-        setSupportActionBar(findViewById(R.id.toolbar))
-        supportActionBar?.title = "ClayModeler"
-        supportActionBar?.setDisplayShowTitleEnabled(true)
+        // Set up floating menu button
+        val fabMenu = findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fab_menu)
+        fabMenu?.setOnClickListener {
+            // Show menu (will implement popup menu)
+            showMenu(it)
+        }
         
         // Set up GLSurfaceView
         glSurfaceView = GLSurfaceView(this)
@@ -92,8 +99,9 @@ class MainActivity : AppCompatActivity() {
         val btnPinch = findViewById<android.widget.Button>(R.id.btn_pinch)
         val btnInflate = findViewById<android.widget.Button>(R.id.btn_inflate)
         val btnView = findViewById<android.widget.Button>(R.id.btn_view)
-        
-        val toolButtons = listOfNotNull(btnRemove, btnAdd, btnPull, btnSmooth, btnFlatten, btnPinch, btnInflate, btnView)
+        val btnLight = findViewById<android.widget.Button>(R.id.btn_light)
+
+        val toolButtons = listOfNotNull(btnRemove, btnAdd, btnPull, btnSmooth, btnFlatten, btnPinch, btnInflate, btnView, btnLight)
         
         btnUndo?.setOnClickListener {
             viewModel.undo()
@@ -124,6 +132,9 @@ class MainActivity : AppCompatActivity() {
         }
         btnView?.setOnClickListener {
             viewModel.setTool(viewModel.viewModeTool)
+        }
+        btnLight?.setOnClickListener {
+            viewModel.setTool(viewModel.lightModeTool)
         }
         
         // Set up symmetry button
@@ -222,6 +233,10 @@ class MainActivity : AppCompatActivity() {
         findViewById<android.widget.Button>(R.id.btn_pinch)?.isSelected = false
         findViewById<android.widget.Button>(R.id.btn_inflate)?.isSelected = false
         findViewById<android.widget.Button>(R.id.btn_view)?.isSelected = false
+        findViewById<android.widget.Button>(R.id.btn_light)?.isSelected = false
+        renderer.showLightIndicator = tool is LightModeTool
+        findViewById<android.widget.Button>(R.id.btn_light)?.isSelected = false
+        renderer.showLightIndicator = tool is LightModeTool
         
         // Highlight active tool
         when (tool) {
@@ -233,6 +248,7 @@ class MainActivity : AppCompatActivity() {
             viewModel.pinchTool -> findViewById<android.widget.Button>(R.id.btn_pinch)?.isSelected = true
             viewModel.inflateTool -> findViewById<android.widget.Button>(R.id.btn_inflate)?.isSelected = true
             viewModel.viewModeTool -> findViewById<android.widget.Button>(R.id.btn_view)?.isSelected = true
+            viewModel.lightModeTool -> findViewById<android.widget.Button>(R.id.btn_light)?.isSelected = true
         }
     }
     
@@ -304,6 +320,22 @@ class MainActivity : AppCompatActivity() {
                                     }
                                 }
                             }
+                        } else if (viewModel.toolEngine.getActiveTool() is LightModeTool) {
+                            val model = viewModel.model.value
+                            if (model != null) {
+                                val sensitivity = 0.02f
+                                val lp = model.lightPosition
+                                val dist = kotlin.math.sqrt(lp.x * lp.x + lp.y * lp.y + lp.z * lp.z)
+                                var theta = kotlin.math.atan2(lp.z, lp.x) + dx * sensitivity
+                                var phi = kotlin.math.acos((lp.y / dist).coerceIn(-1f, 1f)) + dy * sensitivity
+                                phi = phi.coerceIn(0.1f, Math.PI.toFloat() - 0.1f)
+                                model.lightPosition = com.claymodeler.model.Vector3(
+                                    dist * kotlin.math.sin(phi) * kotlin.math.cos(theta),
+                                    dist * kotlin.math.cos(phi),
+                                    dist * kotlin.math.sin(phi) * kotlin.math.sin(theta)
+                                )
+                                renderer.showLightIndicator = true
+                            }
                         } else {
                             glSurfaceView.queueEvent {
                                 renderer.rotateCamera(dx, dy)
@@ -367,14 +399,27 @@ class MainActivity : AppCompatActivity() {
         glSurfaceView.onResume()
     }
     
-    override fun onCreateOptionsMenu(menu: android.view.Menu): Boolean {
-        menu.add(0, 1, 0, "New")
-        menu.add(0, 2, 0, "Save")
-        menu.add(0, 3, 0, "Load")
-        menu.add(0, 4, 0, "Examples")
-        menu.add(0, 5, 0, "Lighting")
-        menu.add(0, 6, 0, "Export STL")
-        return true
+    private fun showMenu(view: android.view.View) {
+        val popup = android.widget.PopupMenu(this, view)
+        popup.menu.add(0, 1, 0, "New")
+        popup.menu.add(0, 2, 0, "Save")
+        popup.menu.add(0, 3, 0, "Load")
+        popup.menu.add(0, 4, 0, "Examples")
+        popup.menu.add(0, 6, 0, "Export STL")
+        popup.menu.add(0, 7, 0, "Export with Options...")
+        
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                1 -> { showNewDialog(); true }
+                2 -> { showSaveDialog(); true }
+                3 -> { showLoadDialog(); true }
+                4 -> { showExamplesDialog(); true }
+                6 -> { showExportDialog(); true }
+                7 -> { launchExportWizard(); true }
+                else -> false
+            }
+        }
+        popup.show()
     }
     
     override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
@@ -396,7 +441,7 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             5 -> {
-                showLightingDialog()
+                showExamplesDialog()
                 true
             }
             6 -> {
@@ -454,11 +499,6 @@ class MainActivity : AppCompatActivity() {
         }.show()
     }
     
-    private fun showLightingDialog() {
-        viewModel.model.value?.let { model ->
-            com.claymodeler.ui.LightingDialog(this, model).show()
-        }
-    }
     
     private fun showExamplesDialog() {
         val exampleManager = com.claymodeler.examples.ExampleManager(this)
@@ -535,6 +575,12 @@ class MainActivity : AppCompatActivity() {
                 android.widget.Toast.makeText(this, "Export failed: ${e.message}", android.widget.Toast.LENGTH_LONG).show()
             }
         }.show()
+    }
+    
+    private fun launchExportWizard() {
+        val model = viewModel.model.value ?: return
+        com.claymodeler.ui.wizard.ExportWizardActivity.modelHolder = model.clone()
+        startActivity(android.content.Intent(this, com.claymodeler.ui.wizard.ExportWizardActivity::class.java))
     }
     
     override fun onDestroy() {

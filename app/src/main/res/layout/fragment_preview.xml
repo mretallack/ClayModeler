@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <FrameLayout
+        android:id="@+id/preview_3d_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/viewport_background"
+        android:contentDescription="3D preview of model with attachment" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="8dp">
+
+        <TextView
+            android:id="@+id/txt_preview_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Merged model info"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/btn_back_to_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="← Back to Edit"
+            android:layout_marginTop="8dp"
+            android:minHeight="48dp"
+            android:contentDescription="Return to configuration step" />
+    </LinearLayout>
+</LinearLayout>

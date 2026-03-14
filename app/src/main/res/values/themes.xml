@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.ClayModeller" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Primary brand color -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        
+        <!-- Status bar color (matches toolbar) -->
+        <item name="android:statusBarColor">@color/primary_dark</item>
+        
+        <!-- Light status bar icons (false = white icons on dark background) -->
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

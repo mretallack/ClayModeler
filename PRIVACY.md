@@ -2,7 +2,7 @@
 
 ## Data Collection
 
-ClayModeler does **not** collect, store, or transmit any personal data.
+ClayModeller does **not** collect, store, or transmit any personal data.
 
 ## Local Storage
 
@@ -14,7 +14,7 @@ All data is stored locally on your device:
 
 ## Permissions
 
-ClayModeler requests the following permissions:
+ClayModeller requests the following permissions:
 
 ### Storage (Android 9 and below)
 - **Purpose**: Save and load 3D models, export STL files
@@ -22,7 +22,7 @@ ClayModeler requests the following permissions:
 - **Data**: Model files only, no personal information
 
 ### No Internet Permission
-ClayModeler does not have internet permission and cannot send data anywhere.
+ClayModeller does not have internet permission and cannot send data anywhere.
 
 ## Crash Reports
 
@@ -36,11 +36,11 @@ Crash reports are handled by ACRA (Application Crash Reports for Android) and st
 
 ## Third-Party Services
 
-ClayModeler does not use any third-party analytics, advertising, or tracking services.
+ClayModeller does not use any third-party analytics, advertising, or tracking services.
 
 ## GDPR Compliance
 
-As ClayModeler does not collect any personal data, GDPR does not apply. All data remains on your device under your control.
+As ClayModeller does not collect any personal data, GDPR does not apply. All data remains on your device under your control.
 
 ## Children's Privacy
 

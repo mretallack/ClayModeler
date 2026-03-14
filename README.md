@@ -1,4 +1,4 @@
-# ClayModeler
+# ClayModeller
 
 An Android app for creating 3D models that can be printed using clay.
 
@@ -18,7 +18,7 @@ An Android app for creating 3D models that can be printed using clay.
 
 ## Screenshots
 
-<img src="screenshots/app-main-screen.jpg" width="300" alt="ClayModeler main screen showing sculpting tools and clay sphere">
+<img src="screenshots/app-main-screen.jpg" width="300" alt="ClayModeller main screen showing sculpting tools and clay sphere">
 
 *Main screen with sculpting tools and adjustable brush size/strength*
 
@@ -32,7 +32,7 @@ An Android app for creating 3D models that can be printed using clay.
 
 ### From GitHub Releases
 
-1. Download the latest APK from [Releases](https://github.com/yourusername/ClayModeler/releases)
+1. Download the latest APK from [Releases](https://github.com/yourusername/ClayModeller/releases)
 2. Enable "Install from Unknown Sources" in Android settings
 3. Install the APK
 
@@ -48,8 +48,8 @@ An Android app for creating 3D models that can be printed using clay.
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/ClayModeler.git
-cd ClayModeler
+git clone https://github.com/yourusername/ClayModeller.git
+cd ClayModeller
 
 # Build debug APK
 ./gradlew assembleDebug

@@ -14,6 +14,7 @@ class SaveLoadWorkflowTest : FunSpec({
         val context = mockk<Context>()
         val tempDir = createTempDir()
         every { context.filesDir } returns tempDir
+        every { context.getExternalFilesDir(null) } returns null
         
         val fileManager = FileManager(context)
         

@@ -11,7 +11,14 @@ import java.nio.ByteOrder
 import java.util.zip.CRC32
 
 class FileManager(private val context: Context) {
-    
+
+    private val saveDir: File get() {
+        val ext = context.getExternalFilesDir(null)
+        val dir = ext ?: context.filesDir
+        if (!dir.exists()) dir.mkdirs()
+        return dir
+    }
+
     companion object {
         private const val MAGIC_NUMBER = 0x434C4159 // "CLAY"
         private const val VERSION = 1
@@ -19,8 +26,8 @@ class FileManager(private val context: Context) {
     }
     
     fun save(model: ClayModel, filename: String): File {
-        val file = File(context.filesDir, "$filename.clay")
-        val tempFile = File(context.filesDir, "$filename.clay.tmp")
+        val file = File(saveDir, "$filename.clay")
+        val tempFile = File(saveDir, "$filename.clay.tmp")
         
         try {
             // Create metadata (simple key=value format)
@@ -108,7 +115,7 @@ class FileManager(private val context: Context) {
     }
     
     fun load(filename: String): ClayModel {
-        val file = File(context.filesDir, "$filename.clay")
+        val file = File(saveDir, "$filename.clay")
         
         if (!file.exists()) {
             throw IllegalArgumentException("File not found: $filename")
@@ -211,14 +218,14 @@ class FileManager(private val context: Context) {
     }
     
     fun listFiles(): List<String> {
-        return context.filesDir.listFiles()
+        return saveDir.listFiles()
             ?.filter { it.extension == "clay" }
             ?.map { it.nameWithoutExtension }
             ?: emptyList()
     }
     
     fun delete(filename: String): Boolean {
-        val file = File(context.filesDir, "$filename.clay")
+        val file = File(saveDir, "$filename.clay")
         return file.delete()
     }
 }

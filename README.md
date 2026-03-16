@@ -220,3 +220,8 @@ MIT License - see LICENSE file
 ## Privacy
 
 ClayModeler does not collect any user data. All files are stored locally on your device. Crash reports are only shared if you choose to send them.
+
+## TODO
+
+- Screen rotation incorrectly triggers the resume/unsaved changes dialog
+- Add sharing support for STL exports and clay files

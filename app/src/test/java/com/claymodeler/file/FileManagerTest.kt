@@ -15,6 +15,7 @@ class FileManagerTest : FunSpec({
         val context = mockk<Context>()
         val tempDir = createTempDir()
         every { context.filesDir } returns tempDir
+        every { context.getExternalFilesDir(null) } returns null
         
         val fileManager = FileManager(context)
         
@@ -38,6 +39,7 @@ class FileManagerTest : FunSpec({
         val context = mockk<Context>()
         val tempDir = createTempDir()
         every { context.filesDir } returns tempDir
+        every { context.getExternalFilesDir(null) } returns null
         
         val fileManager = FileManager(context)
         val model = ClayModel()
@@ -55,6 +57,7 @@ class FileManagerTest : FunSpec({
         val context = mockk<Context>()
         val tempDir = createTempDir()
         every { context.filesDir } returns tempDir
+        every { context.getExternalFilesDir(null) } returns null
         
         val fileManager = FileManager(context)
         
@@ -74,6 +77,7 @@ class FileManagerTest : FunSpec({
         val context = mockk<Context>()
         val tempDir = createTempDir()
         every { context.filesDir } returns tempDir
+        every { context.getExternalFilesDir(null) } returns null
         
         val fileManager = FileManager(context)
         val model = ClayModel()
@@ -95,6 +99,7 @@ class FileManagerTest : FunSpec({
         val context = mockk<Context>()
         val tempDir = createTempDir()
         every { context.filesDir } returns tempDir
+        every { context.getExternalFilesDir(null) } returns null
         
         val fileManager = FileManager(context)
         val model = ClayModel()
@@ -113,6 +118,7 @@ class FileManagerTest : FunSpec({
         val context = mockk<Context>()
         val tempDir = createTempDir()
         every { context.filesDir } returns tempDir
+        every { context.getExternalFilesDir(null) } returns null
         
         val fileManager = FileManager(context)
         val model = ClayModel()
